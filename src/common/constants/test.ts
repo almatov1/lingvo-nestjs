@@ -7,21 +7,21 @@ export const TEST = [
     {
         question: "Сұрақ 2? (мысал)",
         answers: ["А", "B", "C", "D"],
-        correctAnswer: 1
+        correctAnswer: 0
     },
     {
         question: "Сұрақ 3? (мысал)",
         answers: ["А", "B", "C", "D"],
-        correctAnswer: 1
+        correctAnswer: 0
     },
     {
         question: "Сұрақ 4? (мысал)",
         answers: ["А", "B", "C", "D"],
-        correctAnswer: 2
+        correctAnswer: 0
     },
     {
         question: "Сұрақ 5? (мысал)",
         answers: ["А", "B", "C", "D"],
-        correctAnswer: 3
+        correctAnswer: 0
     }
 ];

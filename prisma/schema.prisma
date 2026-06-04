@@ -20,11 +20,17 @@ model User {
   language      Language    @default(kk)
   level         Level?
   format        Format?
+
   currentStep   Step        @default(CHOOSE_LANGUAGE)
   testAnswers   Int[]
 
+  currentTopic    Int?
+  currentTask     TaskType?
+
   updatedAt   DateTime?   @updatedAt  @db.Timestamptz(6)
   createdAt   DateTime    @default(now()) @db.Timestamptz(6)
+
+  results   TopicResult[]
 }
 
 enum Language {
@@ -54,4 +60,31 @@ enum Step {
   FORMAT_OFFLINE
   FORMAT_ONLINE
   COMPLETED
+}
+
+enum TaskType {
+  READING
+  WRITING
+  LISTENING
+  SPEAKING
+}
+
+model TopicResult {
+  id    Int   @id @default(autoincrement())
+
+  userId    Int
+  level     Level
+  topic     Int
+
+  readingAnswers      Int[]
+  writingAnswer       String?
+  listeningAnswers    Int[]
+  speakingFile        String?
+
+  updatedAt   DateTime?   @updatedAt  @db.Timestamptz(6)
+  createdAt   DateTime    @default(now()) @db.Timestamptz(6)
+
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, level, topic])
 }

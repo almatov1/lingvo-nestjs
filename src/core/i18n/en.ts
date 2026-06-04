@@ -67,5 +67,55 @@ export default {
         <a href="https://termincom.kz/about">Терминдер</a>
         <a href="https://sozdikqor.kz">Сөздікқор</a>
         <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
-    `)
+    `),
+    onlineFormat: dedent(`
+        <b>We offer you the following learning topics:</b>
+    `),
+    lockedTopic: 'Please complete the previous topic first',
+    topic: dedent(`
+        <b>In this lesson, we learn the language through 4 skills:</b>
+        📖 Reading
+        ✍️ Writing
+        🎧 Listening
+        🗣️ Speaking
+    `),
+    reading: dedent(`
+        <b>Reading</b>
+        Read the short text.
+        After reading, try to complete the tasks.
+        Take your time — understanding what you read is what matters.
+    `),
+    writing: dedent(`
+        <b>Writing</b>
+        Now, try to express your thoughts in writing.
+        Complete a short writing task on the topic.
+        Don't be afraid of making mistakes — we learn through practice!    
+    `),
+    listening: dedent(`
+        <b>Listening</b>
+        Now, let's listen to the audio. 🎧
+        Listen to the text carefully and try to catch the main idea.
+        Then, try to complete the tasks.
+        Don't worry — with every listening practice, your language skills get better! 🌟
+    `),
+    speaking: dedent(`
+        <b>Speaking</b>
+        Try to answer the questions orally.
+        Try to speak freely.
+        The main thing is to strive to express your thoughts in Kazakh.
+        You can definitely do it! 🌟
+    `),
+    finishTopic: dedent(`
+        <b>Summary</b>
+        Well done! 🎉
+        You have successfully completed all the tasks on this topic!
+        Give yourself a round of applause 👏
+        Now you are ready to move on to the next topic!
+    `),
+    completed: dedent(`
+        <b>Summary</b>
+        Well done! 🎉
+        You have successfully completed all the tasks across all levels!
+        Give yourself a round of applause 👏
+    `),
 } as const;

@@ -39,6 +39,7 @@ export class TestHandler {
 
         q.answers.forEach((a, i) => {
             keyboard.text(a, String(i));
+            if (i % 2 === 1) keyboard.row();
         });
 
         await ctx.reply(q.question, {
@@ -47,7 +48,9 @@ export class TestHandler {
     }
 
     private async finishTest(ctx: Context, user: User) {
-        const score = user.testAnswers.reduce((sum, a) => sum + a, 0);
+        const score = user.testAnswers.filter(
+            (answer, index) => answer === TEST[index].correctAnswer
+        ).length;
 
         // const level =
         //     score < 6 ? Level.A1 :

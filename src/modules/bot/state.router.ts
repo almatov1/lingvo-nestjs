@@ -6,6 +6,7 @@ import { LanguageHandler } from "./handlers/language.handler";
 import { RegistrationHandler } from "./handlers/registration.handler";
 import { TestHandler } from "./handlers/test.handler";
 import { FormatHandler } from "./handlers/format.handler";
+import { LearningHandler } from "./handlers/learning.handler";
 
 @Injectable()
 export class StateRouter {
@@ -14,7 +15,8 @@ export class StateRouter {
         private readonly languageHandler: LanguageHandler,
         private readonly registrationHandler: RegistrationHandler,
         private readonly testHandler: TestHandler,
-        private readonly formatHandler: FormatHandler
+        private readonly formatHandler: FormatHandler,
+        private readonly learningHandler: LearningHandler
     ) { }
 
     async handle(ctx: Context) {
@@ -33,6 +35,8 @@ export class StateRouter {
                 return this.languageHandler.handle(ctx, user);
             case Step.REGISTRATION:
                 return this.registrationHandler.handle(ctx, user);
+            case Step.FORMAT_ONLINE:
+                return this.learningHandler.handle(ctx, user);
         }
     }
 
@@ -50,6 +54,8 @@ export class StateRouter {
                 return this.testHandler.handleCallback(ctx, user);
             case Step.LEARNING_FORMAT:
                 return this.formatHandler.handleCallback(ctx, user);
+            case Step.FORMAT_ONLINE:
+                return this.learningHandler.handleCallback(ctx, user);
         }
     }
 }
