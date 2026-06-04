@@ -25,3 +25,5 @@ export const TEST = [
         correctAnswer: 0
     }
 ];
+
+export const VARIANT_LABEL = ['а)', 'ә)', 'б)', 'в)'];

@@ -71,7 +71,7 @@ export default {
     onlineFormat: dedent(`
         <b>We offer you the following learning topics:</b>
     `),
-    lockedTopic: 'Please complete the previous topic first',
+    lockedTopic: 'This lesson is not available. Complete previous topics or move to the next one.',
     topic: dedent(`
         <b>In this lesson, we learn the language through 4 skills:</b>
         📖 Reading

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Context, InlineKeyboard } from 'grammy'
-import { TEST } from 'src/common/constants/test';
+import { TEST, VARIANT_LABEL } from 'src/common/constants/test';
 import { I18nService } from 'src/core/i18n/i18n.service';
 import { PrismaService } from 'src/core/prisma/prisma.service'
 import { User } from 'src/generated/prisma/client';
@@ -38,7 +38,7 @@ export class TestHandler {
         const keyboard = new InlineKeyboard();
 
         q.answers.forEach((a, i) => {
-            keyboard.text(a, String(i));
+            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
             if (i % 2 === 1) keyboard.row();
         });
 

@@ -6,6 +6,7 @@ import { PrismaService } from 'src/core/prisma/prisma.service'
 import { StorageService } from 'src/core/storage/storage.service'
 import { Step, TaskType, TopicResult, User } from 'src/generated/prisma/client'
 import dedent from 'dedent';
+import { VARIANT_LABEL } from 'src/common/constants/test'
 
 @Injectable()
 export class LearningHandler {
@@ -25,7 +26,7 @@ export class LearningHandler {
                 level: user.level,
             },
         });
-        const completedTopics = new Set(
+        const completed = new Set(
             results
                 .filter(r => r.speakingFile)
                 .map(r => r.topic)
@@ -36,13 +37,17 @@ export class LearningHandler {
         topics.forEach((topic, index) => {
             const unlocked =
                 index === 0 ||
-                completedTopics.has(index - 1);
+                completed.has(index - 1);
+
+            const alreadyCompleted = completed.has(index);
 
             keyboard.text(
-                unlocked
-                    ? `${index + 1}. ${topic.title}`
-                    : `🔒 ${index + 1}. ${topic.title}`,
-                unlocked
+                alreadyCompleted
+                    ? `✅ ${index + 1}. ${topic.title}`
+                    : unlocked
+                        ? `${index + 1}. ${topic.title}`
+                        : `🔒 ${index + 1}. ${topic.title}`,
+                unlocked && !alreadyCompleted
                     ? `topic_${index}`
                     : 'topic_locked'
             );
@@ -214,7 +219,7 @@ export class LearningHandler {
 
         const q = topic.readingTest[result?.readingAnswers.length!];
         topic.readingTest[result?.readingAnswers.length!].answers.forEach((a, i) => {
-            keyboard.text(a, String(i));
+            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
             keyboard.row();
         });
 
@@ -333,7 +338,7 @@ export class LearningHandler {
 
         const q = topic.listeningTest[result?.listeningAnswers.length!];
         topic.listeningTest[result?.listeningAnswers.length!].answers.forEach((a, i) => {
-            keyboard.text(a, String(i));
+            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
             keyboard.row();
         });
 
