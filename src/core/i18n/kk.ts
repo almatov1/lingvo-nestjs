@@ -1,0 +1,71 @@
+import dedent from 'dedent';
+import { Format, Level } from 'src/generated/prisma/enums';
+
+export default {
+    registration: dedent(`
+        <b>Тіркелу</b>
+        Сабақты бастамас бұрын, сізбен аздап танысып алайық.
+        Төмендегі ақпараттарды толтырыңыз: 
+        Аты-жөніңіз, тегіңіз: 
+        Туған күніңіз (күні, айы, жылы): 
+        Ұлтыңыз: 
+        Жұмыс орныңыз: 
+        Тұрақты мекенжайыңыз: 
+        Байланыс нөміріңіз:
+    `),
+    test: dedent(`
+        <b>Деңгейді анықтау</b>
+        Енді шағын диагностикалық тесттен өтейік.
+        Бұл тест сіздің қазіргі қазақ тілі деңгейіңізді анықтауға көмектеседі.
+        Уайымдамаңыз - мұнда «дұрыс» немесе «қате» нәтиже жоқ. Біз тек сізге қай деңгейден бастау тиімді екенін анықтаймыз.
+    `),
+    testResult: dedent(`
+        <b>Нәтиже</b>
+        Тест аяқталды! 🎉
+        Сіздің деңгейіңіз: {{level}} ({{levelName}})
+        Керемет бастама!
+        Енді осы деңгейге сәйкес тапсырмалармен жұмыс істейміз. 
+        Қазақ тілін бірге үйренеміз, тәжірибе жасаймыз, қателесеміз, қайта үйренеміз - ең бастысы, алға жылжимыз! 😊
+    `),
+    levelNames: {
+        [Level.A1]: "Қарапайым",
+        [Level.A2]: "Базалық",
+        [Level.B1]: "Орташа",
+        [Level.B2]: "Жетік",
+        [Level.C1]: "Жоғары"
+    },
+    chooseFormat: dedent(`
+        <b>Сабақ форматын таңдау</b>
+        Қай формат сізге ыңғайлы?
+    `),
+    formats: {
+        [Format.Online]: "✅ Онлайн оқу",
+        [Format.Offline]: "✅ Оффлайн оқу"
+    },
+    offlineFormat: dedent(`
+        <b>Офлайн оқу</b>
+        Егер офлайн форматты таңдасаңыз, біз сізді орталығымызда қуана қарсы аламыз!
+        <b>Мекеме:</b>
+        «Ақтөбе облысының Тілдерді дамыту басқармасы» ММ
+        «Тілдерді оқыту орталығы» КММ
+        <b>Мекенжай:</b>
+        Ақтөбе қаласы, Тургенев көшесі, 86
+        <b>Байланыс нөмірі:</b>
+        +7 (7132) 46-78-68
+        
+        Ақпарат тақтасы
+        Бізбен байланыста болыңыз:
+        📱 Instagram парақшасы: <a href="https://www.instagram.com/tilderdi.oqytu.ortalygy/">Тілдерді оқыту орталығы</a>
+        📘 Facebook парақшасы: <a href="https://www.facebook.com/tilderdi.oqytu.ortalygy/about">Тілдерді оқыту орталығы</a>
+        🎥 Ютуб каналы: <a href="https://www.youtube.com/@tilaqtobe">Тілдерді оқыту орталығы</a>
+        🌐 Тілдік toolbox: 
+        <a href="https://tilqazyna.kz">Тіл-Қазына</a>
+        <a href="https://tilqural.kz">Тілқұрал</a>
+        <a href="https://soyle.kz">Сөйле</a>
+        <a href="https://www.instagram.com/qazaqgrammar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw">Qazaqgrammar</a>
+        <a href="https://emle.kz">Қазақ тілінің орфографиялық электрондық базасы</a>
+        <a href="https://termincom.kz/about">Терминдер</a>
+        <a href="https://sozdikqor.kz">Сөздікқор</a>
+        <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
+    `)
+} as const;

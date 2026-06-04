@@ -12,3 +12,46 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id            Int         @id @default(autoincrement())
+  telegramId    BigInt      @unique
+  data          String?
+  language      Language    @default(kk)
+  level         Level?
+  format        Format?
+  currentStep   Step        @default(CHOOSE_LANGUAGE)
+  testAnswers   Int[]
+
+  updatedAt   DateTime?   @updatedAt  @db.Timestamptz(6)
+  createdAt   DateTime    @default(now()) @db.Timestamptz(6)
+}
+
+enum Language {
+  kk
+  ru
+  en
+}
+
+enum Level {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum Format {
+  Online
+  Offline
+}
+
+enum Step {
+  CHOOSE_LANGUAGE
+  REGISTRATION
+  PLACEMENT_TEST
+  LEARNING_FORMAT
+  FORMAT_OFFLINE
+  FORMAT_ONLINE
+  COMPLETED
+}

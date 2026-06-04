@@ -1,0 +1,71 @@
+import dedent from 'dedent';
+import { Format, Level } from 'src/generated/prisma/enums';
+
+export default {
+    registration: dedent(`
+        <b>Registration</b>
+        Before starting the lesson, let's get to know each other a little better.
+        Please fill in the following information:
+        First name, last name:
+        Date of birth (day, month, year):
+        Nationality:
+        Place of work:
+        Permanent address:
+        Contact number:
+    `),
+    test: dedent(`
+        <b>Language Level Assessment</b>
+        Let’s take a short diagnostic test.
+        This test will help determine your current level of Kazakh language proficiency.
+        Don’t worry — there are no “right” or “wrong” results here. We simply want to identify the most suitable level for you to begin learning.
+    `),
+    testResult: dedent(`
+        <b>Result</b>
+        The test is completed! 🎉
+        Your level: {{level}} ({{levelName}})
+        Great start!
+        Now we will work on tasks that match your level.
+        Let’s learn Kazakh together, practice, make mistakes, learn again — most importantly, keep moving forward! 😊
+    `),
+    levelNames: {
+        [Level.A1]: "Beginner",
+        [Level.A2]: "Elementary",
+        [Level.B1]: "Intermediate",
+        [Level.B2]: "Upper-Intermediate",
+        [Level.C1]: "Advanced",
+    },
+    chooseFormat: dedent(`
+        <b>Learning Format Selection</b>
+        Which learning format do you prefer?
+    `),
+    formats: {
+        [Format.Online]: "✅ Online",
+        [Format.Offline]: "✅ Offline"
+    },
+    offlineFormat: dedent(`
+        <b>Offline Learning</b>
+        If you choose the offline format, we will be happy to welcome you to our center!
+        <b>Institution:</b>
+        State Institution "Department of Language Development of Aktobe Region"
+        Communal State Institution "Language Training Center"
+        <b>Address:</b>
+        86 Turgenev Street, Aktobe City
+        <b>Contact Number:</b>
+        +7 (7132) 46-78-68
+        
+        Information Board
+        Stay in touch with us:
+        📱 Instagram page: <a href="https://www.instagram.com/tilderdi.oqytu.ortalygy/">Тілдерді оқыту орталығы</a>
+        📘 Facebook page: <a href="https://www.facebook.com/tilderdi.oqytu.ortalygy/about">Тілдерді оқыту орталығы</a>
+        🎥 YouTube channel: <a href="https://www.youtube.com/@tilaqtobe">Тілдерді оқыту орталығы</a>
+        🌐 Language toolbox: 
+        <a href="https://tilqazyna.kz">Тіл-Қазына</a>
+        <a href="https://tilqural.kz">Тілқұрал</a>
+        <a href="https://soyle.kz">Сөйле</a>
+        <a href="https://www.instagram.com/qazaqgrammar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw">Qazaqgrammar</a>
+        <a href="https://emle.kz">Қазақ тілінің орфографиялық электрондық базасы</a>
+        <a href="https://termincom.kz/about">Терминдер</a>
+        <a href="https://sozdikqor.kz">Сөздікқор</a>
+        <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
+    `)
+} as const;
