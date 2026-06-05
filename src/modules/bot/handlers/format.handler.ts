@@ -40,6 +40,6 @@ export class FormatHandler {
             this.i18n.t('offlineFormat', user.language),
             { parse_mode: 'HTML' }
         );
-        else await this.learningHandler.showTopics(ctx, user);
+        else await this.learningHandler.openMenu(ctx, user);
     }
 }

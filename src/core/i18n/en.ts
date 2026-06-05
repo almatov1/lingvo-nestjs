@@ -72,13 +72,7 @@ export default {
         <b>We offer you the following learning topics:</b>
     `),
     lockedTopic: 'This lesson is not available. Complete previous topics or move to the next one.',
-    topic: dedent(`
-        <b>In this lesson, we learn the language through 4 skills:</b>
-        📖 Reading
-        ✍️ Writing
-        🎧 Listening
-        🗣️ Speaking
-    `),
+    topic: dedent(`<b>In this lesson, we learn the language through 4 skills:</b>`),
     reading: dedent(`
         <b>Reading</b>
         Read the short text.
@@ -112,10 +106,14 @@ export default {
         Give yourself a round of applause 👏
         Now you are ready to move on to the next topic!
     `),
-    completed: dedent(`
-        <b>Summary</b>
-        Well done! 🎉
-        You have successfully completed all the tasks across all levels!
-        Give yourself a round of applause 👏
-    `),
+    menu: {
+        title: "Menu",
+        topics: "📚 Topics",
+        back: "⬅️ Back",
+        reading: "Reading",
+        writing: "Writing",
+        listening: "Listening",
+        speaking: "Speaking"
+    },
+    lockedTask: 'This task is not available. Complete previous tasks or move to the next one.',
 } as const;

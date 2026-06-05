@@ -27,6 +27,8 @@ model User {
   currentTopic    Int?
   currentTask     TaskType?
 
+  uiScreen    OnlineScreen?
+
   updatedAt   DateTime?   @updatedAt  @db.Timestamptz(6)
   createdAt   DateTime    @default(now()) @db.Timestamptz(6)
 
@@ -67,6 +69,13 @@ enum TaskType {
   WRITING
   LISTENING
   SPEAKING
+}
+
+enum OnlineScreen {
+  MENU
+  TOPICS
+  LESSON
+  TASKS
 }
 
 model TopicResult {
