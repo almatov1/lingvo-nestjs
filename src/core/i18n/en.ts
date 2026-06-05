@@ -116,4 +116,10 @@ export default {
         speaking: "Speaking"
     },
     lockedTask: 'This task is not available. Complete previous tasks or move to the next one.',
+    finishedTask: dedent(`
+        <b>Well done! 🎉</b>
+        You have successfully completed all the tasks on this task!
+        Give yourself a round of applause 👏
+        Now you are ready to move on to the next task!
+    `)
 } as const;

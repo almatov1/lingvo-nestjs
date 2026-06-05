@@ -49,10 +49,6 @@ export class LearningHandler {
 
         const keyboard = new InlineKeyboard();
 
-        keyboard
-            .text(this.i18n.t('menu.back', user.language), 'menu_back')
-            .row();
-
         topics.forEach((topic, index) => {
             const unlocked =
                 index === 0 || completed.has(index - 1);
@@ -69,6 +65,9 @@ export class LearningHandler {
             keyboard.row();
         });
 
+        keyboard
+            .text(this.i18n.t('menu.back', user.language), 'menu_back')
+
         await this.prisma.user.update({
             where: { id: user.id },
             data: { uiScreen: OnlineScreen.TOPICS }
@@ -83,7 +82,7 @@ export class LearningHandler {
         );
     }
 
-    async openTopic(ctx: Context, user: User, topicIndex: number) {
+    async openTopic({ ctx, user, topicIndex, isTaskFinish, isReply }: { ctx: Context, user: User, topicIndex: number, isTaskFinish?: boolean, isReply?: boolean }) {
         const result = await this.prisma.topicResult.findFirst({
             where: {
                 userId: user.id,
@@ -122,10 +121,6 @@ export class LearningHandler {
 
         const keyboard = new InlineKeyboard();
 
-        keyboard
-            .text(this.i18n.t('menu.back', user.language), 'menu_back')
-            .row();
-
         keyboard.text(
             `${readingDone ? '✅' : readingIcon} ${this.i18n.t('menu.reading', user.language)}`,
             readingDone ? 'task_locked' : 'lesson_reading'
@@ -148,6 +143,10 @@ export class LearningHandler {
             !listeningDone || speakingDone ? 'task_locked' : 'lesson_speaking'
         );
 
+        keyboard.row();
+
+        keyboard.text(this.i18n.t('menu.back', user.language), 'menu_back')
+
         await this.prisma.user.update({
             where: { id: user.id },
             data: {
@@ -156,8 +155,33 @@ export class LearningHandler {
             }
         });
 
-        await ctx.editMessageText(
-            this.i18n.t('topic', user.language),
+        if (isReply) await ctx.reply(
+            dedent(`
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title}
+
+                ${isTaskFinish
+                    ? `${this.i18n.t('finishedTask', user.language)}
+                    
+                    `
+                    : ''}
+                ${this.i18n.t('topic', user.language)}
+            `),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+        else await ctx.editMessageText(
+            dedent(`
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title}
+
+                ${isTaskFinish
+                    ? `${this.i18n.t('finishedTask', user.language)}
+                    
+                    `
+                    : ''}
+                ${this.i18n.t('topic', user.language)}
+            `),
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
@@ -190,12 +214,9 @@ export class LearningHandler {
 
         if (result?.readingAnswers.length! === 0) {
             await ctx.editMessageText(dedent(`
-                ${result?.readingAnswers.length! === 0 && `
-                    ${this.i18n.t('reading', user.language)}
+                ${this.i18n.t('reading', user.language)}
 
-                    ${topic.reading}
-                `}
-                ${q.question}
+                ${topic.reading}
             `), { parse_mode: 'HTML' });
             await ctx.reply(q.question, { reply_markup: keyboard });
         }
@@ -251,15 +272,16 @@ export class LearningHandler {
         });
 
         if (result?.listeningAnswers.length! === 0) {
-            await ctx.editMessageText(this.i18n.t('listening', user.language)), {
-                parse_mode: 'HTML',
-                reply_markup: keyboard
-            };
+            await ctx.editMessageText(
+                this.i18n.t('listening', user.language),
+                {
+                    parse_mode: 'HTML'
+                }
+            );
             await ctx.replyWithAudio(new InputFile(topic.listening));
             await ctx.reply(q.question, { reply_markup: keyboard });
         }
-
-        await ctx.editMessageText(q.question, { reply_markup: keyboard });
+        else await ctx.editMessageText(q.question, { reply_markup: keyboard });
     }
 
     async startSpeaking(ctx: Context, user: User) {
@@ -316,7 +338,7 @@ export class LearningHandler {
                 const topicIndex = Number(data.split('_')[1]);
                 if (Number.isNaN(topicIndex)) return;
 
-                return this.openTopic(ctx, user, topicIndex);
+                return this.openTopic({ ctx, user, topicIndex });
             }
 
             return;
@@ -386,11 +408,11 @@ export class LearningHandler {
                         currentTask: null,
                     },
                 });
-                await this.openTopic(ctx, user, topicIndex);
+                await this.openTopic({ ctx, user, topicIndex, isTaskFinish: true });
                 return;
             }
 
-            if (user.currentTask === TaskType.LISTENING) {
+            else if (user.currentTask === TaskType.LISTENING) {
                 if (!/^\d+$/.test(data)) return;
 
                 await ctx.answerCallbackQuery();
@@ -429,7 +451,7 @@ export class LearningHandler {
                         currentTask: null,
                     },
                 });
-                await this.openTopic(ctx, user, topicIndex);
+                await this.openTopic({ ctx, user, topicIndex, isTaskFinish: true });
                 return;
             }
         }
@@ -454,7 +476,7 @@ export class LearningHandler {
                 },
             });
 
-            await this.openTopic(ctx, user, user.currentTopic!);
+            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
         }
 
         else if (user.currentTask === TaskType.SPEAKING) {
@@ -485,7 +507,7 @@ export class LearningHandler {
                 },
             });
 
-            await this.openTopic(ctx, user, user.currentTopic!);
+            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
         }
     }
 }
