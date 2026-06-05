@@ -63,9 +63,8 @@ export class LanguageHandler {
             },
         });
 
-        await ctx.editMessageReplyMarkup();
         await ctx.answerCallbackQuery();
-        await ctx.reply(
+        await ctx.editMessageText(
             this.i18n.t('registration', lang),
             { parse_mode: 'HTML' }
         );

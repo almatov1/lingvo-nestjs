@@ -24,10 +24,8 @@ export class RegistrationHandler {
                 currentStep: Step.PLACEMENT_TEST
             },
         });
-        await ctx.reply(
-            this.i18n.t('test', user.language),
-            { parse_mode: 'HTML' }
-        );
-        await this.testHandler.sendQuestion(ctx, 0);
+
+        await ctx.deleteMessage();
+        await this.testHandler.sendQuestion(ctx, 0, this.i18n.t('test', user.language));
     }
 }

@@ -5,6 +5,7 @@ import { I18nService } from 'src/core/i18n/i18n.service';
 import { PrismaService } from 'src/core/prisma/prisma.service'
 import { User } from 'src/generated/prisma/client';
 import { Format, Level, Step } from 'src/generated/prisma/enums';
+import dedent from 'dedent';
 
 @Injectable()
 export class TestHandler {
@@ -25,14 +26,12 @@ export class TestHandler {
                 testAnswers: nextAnswers,
             },
         });
-        await ctx.editMessageReplyMarkup();
-        await ctx.answerCallbackQuery();
 
         if (nextQuestionIndex >= TEST.length) return this.finishTest(ctx, updatedUser);
         return this.sendQuestion(ctx, nextQuestionIndex);
     }
 
-    async sendQuestion(ctx: Context, index: number) {
+    async sendQuestion(ctx: Context, index: number, isAdditionalText?: string) {
         const q = TEST[index];
 
         const keyboard = new InlineKeyboard();
@@ -42,9 +41,24 @@ export class TestHandler {
             if (i % 2 === 1) keyboard.row();
         });
 
-        await ctx.reply(q.question, {
-            reply_markup: keyboard,
-        });
+        if (isAdditionalText) await ctx.reply(
+            dedent(`
+                ${isAdditionalText}
+
+                ${q.question}
+            `),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard,
+            }
+        );
+        else {
+            await ctx.answerCallbackQuery();
+            await ctx.editMessageText(q.question, {
+                parse_mode: 'HTML',
+                reply_markup: keyboard,
+            });
+        }
     }
 
     private async finishTest(ctx: Context, user: User) {
@@ -74,16 +88,17 @@ export class TestHandler {
             },
         });
 
-        await ctx.reply(
-            this.i18n.t('testResult', user.language, {
+        await ctx.answerCallbackQuery();
+
+        await ctx.editMessageText(
+            dedent(`
+                ${this.i18n.t('testResult', user.language, {
                 level,
                 levelName: this.i18n.t(`levelNames.${level}`, user.language)
-            }),
-            { parse_mode: 'HTML' }
-        );
+            })}
 
-        await ctx.reply(
-            this.i18n.t('chooseFormat', user.language),
+                ${this.i18n.t('chooseFormat', user.language)}
+            `),
             {
                 parse_mode: 'HTML',
                 reply_markup: new InlineKeyboard()

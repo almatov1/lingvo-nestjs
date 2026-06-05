@@ -34,10 +34,9 @@ export class FormatHandler {
             },
         });
 
-        await ctx.editMessageReplyMarkup();
         await ctx.answerCallbackQuery();
 
-        if (format === Format.Offline) await ctx.reply(
+        if (format === Format.Offline) await ctx.editMessageText(
             this.i18n.t('offlineFormat', user.language),
             { parse_mode: 'HTML' }
         );
