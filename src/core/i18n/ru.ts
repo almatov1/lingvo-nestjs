@@ -52,21 +52,12 @@ export default {
         город Актобе, улица Тургенева, 86
         <b>Контактный номер:</b>
         +7 (7132) 46-78-68
-        
-        Информационная панель
+
+        <b>Информационная панель</b>
         Оставайтесь с нами на связи:
         📱 Страница Instagram: <a href="https://www.instagram.com/tilderdi.oqytu.ortalygy/">Тілдерді оқыту орталығы</a>
         📘 Страница Facebook: <a href="https://www.facebook.com/tilderdi.oqytu.ortalygy/about">Тілдерді оқыту орталығы</a>
         🎥 Ютуб канал: <a href="https://www.youtube.com/@tilaqtobe">Тілдерді оқыту орталығы</a>
-        🌐 Языковой toolbox: 
-        <a href="https://tilqazyna.kz">Тіл-Қазына</a>
-        <a href="https://tilqural.kz">Тілқұрал</a>
-        <a href="https://soyle.kz">Сөйле</a>
-        <a href="https://www.instagram.com/qazaqgrammar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw">Qazaqgrammar</a>
-        <a href="https://emle.kz">Қазақ тілінің орфографиялық электрондық базасы</a>
-        <a href="https://termincom.kz/about">Терминдер</a>
-        <a href="https://sozdikqor.kz">Сөздікқор</a>
-        <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
     `),
     onlineFormat: dedent(`
         <b>Предлагаем вам следующие темы для обучения:</b>
@@ -113,7 +104,8 @@ export default {
         reading: "Чтение",
         writing: "Письмо",
         listening: "Аудирование",
-        speaking: "Говорение"
+        speaking: "Говорение",
+        toolbox: "🌐 Языковой toolbox"
     },
     lockedTask: 'Эта задача недоступна. Завершите предыдущие задачи или перейдите к следующей.',
     finishedTask: dedent(`
@@ -121,5 +113,16 @@ export default {
         Вы успешно выполнили задание!
         Похлопайте себе 👏
         Теперь вы готовы перейти к следующей задаче!
+    `),
+    toolbox: dedent(`
+        <b>🌐 Языковой toolbox:</b>
+        <a href="https://tilqazyna.kz">Тіл-Қазына</a>
+        <a href="https://tilqural.kz">Тілқұрал</a>
+        <a href="https://soyle.kz">Сөйле</a>
+        <a href="https://www.instagram.com/qazaqgrammar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw">Qazaqgrammar</a>
+        <a href="https://emle.kz">Қазақ тілінің орфографиялық электрондық базасы</a>
+        <a href="https://termincom.kz/about">Терминдер</a>
+        <a href="https://sozdikqor.kz">Сөздікқор</a>
+        <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
     `)
 } as const;

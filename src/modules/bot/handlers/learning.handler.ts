@@ -23,7 +23,9 @@ export class LearningHandler {
         });
 
         const keyboard = new InlineKeyboard()
-            .text(this.i18n.t('menu.topics', user.language), 'menu_topics');
+            .text(this.i18n.t('menu.topics', user.language), 'menu_topics')
+            .row()
+            .text(this.i18n.t('menu.toolbox', user.language), 'menu_toolbox');
 
         await ctx.editMessageText(
             this.i18n.t('menu.title', user.language),
@@ -75,6 +77,25 @@ export class LearningHandler {
 
         await ctx.editMessageText(
             this.i18n.t('onlineFormat', user.language),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+    }
+
+    async showToolbox(ctx: Context, user: User) {
+        const keyboard = new InlineKeyboard();
+        keyboard
+            .text(this.i18n.t('menu.back', user.language), 'menu_back');
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { uiScreen: OnlineScreen.TOPICS }
+        });
+
+        await ctx.editMessageText(
+            this.i18n.t('toolbox', user.language),
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
@@ -318,6 +339,8 @@ export class LearningHandler {
         if (user.uiScreen === OnlineScreen.MENU) {
             if (data === 'menu_topics')
                 return this.showTopics(ctx, user);
+            else if (data === 'menu_toolbox')
+                return this.showToolbox(ctx, user);
             return;
         }
 
