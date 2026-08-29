@@ -27,6 +27,8 @@ export class TestHandler {
             },
         });
 
+        await ctx.answerCallbackQuery();
+
         if (nextQuestionIndex >= TEST.length) return this.finishTest(ctx, updatedUser);
         return this.sendQuestion(ctx, nextQuestionIndex);
     }
@@ -52,13 +54,10 @@ export class TestHandler {
                 reply_markup: keyboard,
             }
         );
-        else {
-            await ctx.answerCallbackQuery();
-            await ctx.editMessageText(q.question, {
-                parse_mode: 'HTML',
-                reply_markup: keyboard,
-            });
-        }
+        else await ctx.editMessageText(q.question, {
+            parse_mode: 'HTML',
+            reply_markup: keyboard,
+        });
     }
 
     private async finishTest(ctx: Context, user: User) {
