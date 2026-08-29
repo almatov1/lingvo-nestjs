@@ -64,17 +64,17 @@ export default {
     `),
     lockedTopic: 'This lesson is not available. Complete previous topics or move to the next one.',
     topic: dedent(`<b>In this lesson, we learn the language through 4 skills:</b>`),
-    reading: dedent(`
-        <b>Reading</b>
-        Read the short text.
-        After reading, try to complete the tasks.
-        Take your time — understanding what you read is what matters.
-    `),
     writing: dedent(`
         <b>Writing</b>
         Now, try to express your thoughts in writing.
         Complete a short writing task on the topic.
         Don't be afraid of making mistakes — we learn through practice!    
+    `),
+    reading: dedent(`
+        <b>Reading</b>
+        Read the short text.
+        After reading, try to complete the tasks.
+        Take your time — understanding what you read is what matters.
     `),
     listening: dedent(`
         <b>Listening</b>

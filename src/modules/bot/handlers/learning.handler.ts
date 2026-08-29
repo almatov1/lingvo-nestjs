@@ -58,10 +58,10 @@ export class LearningHandler {
 
             keyboard.text(
                 done
-                    ? `✅ ${index + 1}. ${topic.title}`
+                    ? `✅ ${index + 1}. ${topic.title[user.language]}`
                     : unlocked
-                        ? `${index + 1}. ${topic.title}`
-                        : `🔒 ${index + 1}. ${topic.title}`,
+                        ? `${index + 1}. ${topic.title[user.language]}`
+                        : `🔒 ${index + 1}. ${topic.title[user.language]}`,
                 unlocked && !done ? `topic_${index}` : 'topic_locked'
             );
             keyboard.row();
@@ -124,39 +124,38 @@ export class LearningHandler {
                 userId: user.id,
                 level: user.level!,
                 topic: topicIndex,
-                readingAnswers: [],
-                listeningAnswers: [],
+                readingAnswers: []
             },
             update: {},
         });
 
-        const readingDone = !!result?.readingAnswers?.length;
         const writingDone = !!result?.writingAnswer;
-        const listeningDone = !!result?.listeningAnswers?.length;
+        const readingDone = !!result?.readingAnswers?.length;
+        const listeningDone = !!result?.listeningAnswer;
         const speakingDone = !!result?.speakingFile;
 
-        const readingIcon = "📖";
         const writingIcon = "✍️";
+        const readingIcon = "📖";
         const listeningIcon = "🎧";
         const speakingIcon = "🗣️";
 
         const keyboard = new InlineKeyboard();
 
         keyboard.text(
-            `${readingDone ? '✅' : readingIcon} ${this.i18n.t('menu.reading', user.language)}`,
-            readingDone ? 'task_locked' : 'lesson_reading'
+            `${writingDone ? '✅' : writingIcon} ${this.i18n.t('menu.writing', user.language)}`,
+            writingDone ? 'task_locked' : 'lesson_writing'
         );
 
         keyboard.text(
-            `${!readingDone ? '🔒' : writingDone ? '✅' : writingIcon} ${this.i18n.t('menu.writing', user.language)}`,
-            !readingDone || writingDone ? 'task_locked' : 'lesson_writing'
+            `${!writingDone ? '🔒' : readingDone ? '✅' : readingIcon} ${this.i18n.t('menu.reading', user.language)}`,
+            !writingDone || readingDone ? 'task_locked' : 'lesson_reading'
         );
 
         keyboard.row();
 
         keyboard.text(
-            `${!writingDone ? '🔒' : listeningDone ? '✅' : listeningIcon} ${this.i18n.t('menu.listening', user.language)}`,
-            !writingDone || listeningDone ? 'task_locked' : 'lesson_listening'
+            `${!readingDone ? '🔒' : listeningDone ? '✅' : listeningIcon} ${this.i18n.t('menu.listening', user.language)}`,
+            !readingDone || listeningDone ? 'task_locked' : 'lesson_listening'
         );
 
         keyboard.text(
@@ -178,7 +177,9 @@ export class LearningHandler {
 
         if (isReply) await ctx.reply(
             dedent(`
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title}
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title[user.language]}
+
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].description[user.language]}
 
                 ${isTaskFinish
                     ? `${this.i18n.t('finishedTask', user.language)}
@@ -194,7 +195,9 @@ export class LearningHandler {
         );
         else await ctx.editMessageText(
             dedent(`
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title}
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title[user.language]}
+
+                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].description[user.language]}
 
                 ${isTaskFinish
                     ? `${this.i18n.t('finishedTask', user.language)}
@@ -207,6 +210,33 @@ export class LearningHandler {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
             }
+        );
+    }
+
+    async startWriting(ctx: Context, user: User) {
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.level!,
+                topic: user.currentTopic!
+            },
+        });
+        const topic = TOPICS[user.level!][result?.topic!];
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { currentTask: TaskType.WRITING }
+        });
+
+        await ctx.editMessageText(
+            dedent(`
+                ${this.i18n.t('writing', user.language)}
+
+                ${topic.writingTitle[user.language]}
+
+                ${topic.writing}
+            `),
+            { parse_mode: 'HTML' }
         );
     }
 
@@ -244,31 +274,6 @@ export class LearningHandler {
         else await ctx.editMessageText(q.question, { reply_markup: keyboard });
     }
 
-    async startWriting(ctx: Context, user: User) {
-        const result = await this.prisma.topicResult.findFirst({
-            where: {
-                userId: user.id,
-                level: user.level!,
-                topic: user.currentTopic!
-            },
-        });
-        const topic = TOPICS[user.level!][result?.topic!];
-
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { currentTask: TaskType.WRITING }
-        });
-
-        await ctx.editMessageText(
-            dedent(`
-                ${this.i18n.t('writing', user.language)}
-
-                ${topic.writing}
-            `),
-            { parse_mode: 'HTML' }
-        );
-    }
-
     async startListening(ctx: Context, user: User) {
         const result = await this.prisma.topicResult.findFirst({
             where: {
@@ -284,25 +289,21 @@ export class LearningHandler {
             data: { currentTask: TaskType.LISTENING }
         });
 
-        const keyboard = new InlineKeyboard();
+        await ctx.editMessageText(
+            dedent(`
+                ${this.i18n.t('listening', user.language)}
+            `),
+            { parse_mode: 'HTML' }
+        );
+        await ctx.replyWithAudio(new InputFile(topic.listeningAudioPath));
+        await ctx.reply(
+            dedent(`
+                ${topic.listeningTitle[user.language]}
 
-        const q = topic.listeningTest[result?.listeningAnswers.length!];
-        topic.listeningTest[result?.listeningAnswers.length!].answers.forEach((a, i) => {
-            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
-            keyboard.row();
-        });
-
-        if (result?.listeningAnswers.length! === 0) {
-            await ctx.editMessageText(
-                this.i18n.t('listening', user.language),
-                {
-                    parse_mode: 'HTML'
-                }
-            );
-            await ctx.replyWithAudio(new InputFile(topic.listening));
-            await ctx.reply(q.question, { reply_markup: keyboard });
-        }
-        else await ctx.editMessageText(q.question, { reply_markup: keyboard });
+                ${topic.listening}
+            `),
+            { parse_mode: 'HTML' },
+        );
     }
 
     async startSpeaking(ctx: Context, user: User) {
@@ -323,6 +324,8 @@ export class LearningHandler {
         await ctx.editMessageText(
             dedent(`
                 ${this.i18n.t('speaking', user.language)}
+
+                ${topic.speakingTitle[user.language]}
 
                 ${topic.speaking}
             `),
@@ -372,11 +375,11 @@ export class LearningHandler {
             if (data === 'menu_back') return this.showTopics(ctx, user);
 
             switch (data) {
-                case 'lesson_reading':
-                    return this.startReading(ctx, user);
-
                 case 'lesson_writing':
                     return this.startWriting(ctx, user);
+
+                case 'lesson_reading':
+                    return this.startReading(ctx, user);
 
                 case 'lesson_listening':
                     return this.startListening(ctx, user);
@@ -434,49 +437,6 @@ export class LearningHandler {
                 await this.openTopic({ ctx, user, topicIndex, isTaskFinish: true });
                 return;
             }
-
-            else if (user.currentTask === TaskType.LISTENING) {
-                if (!/^\d+$/.test(data)) return;
-
-                await ctx.answerCallbackQuery();
-
-                const topicIndex = user.currentTopic!;
-                const level = user.level!;
-
-                const result = await this.prisma.topicResult.findFirst({
-                    where: {
-                        userId: user.id,
-                        level,
-                        topic: topicIndex,
-                    },
-                });
-                const topic = TOPICS[level][topicIndex];
-
-                const answerIndex = Number(data);
-                const updatedAnswers = [
-                    ...(result!.listeningAnswers ?? []),
-                    answerIndex
-                ];
-                await this.prisma.topicResult.update({
-                    where: { id: result!.id },
-                    data: { listeningAnswers: updatedAnswers },
-                });
-
-                const nextIndex = updatedAnswers.length;
-                if (nextIndex < topic.listeningTest.length) {
-                    await this.startListening(ctx, user);
-                    return;
-                }
-
-                await this.prisma.user.update({
-                    where: { id: user.id },
-                    data: {
-                        currentTask: null,
-                    },
-                });
-                await this.openTopic({ ctx, user, topicIndex, isTaskFinish: true });
-                return;
-            }
         }
     }
 
@@ -496,6 +456,19 @@ export class LearningHandler {
                 where: { id: result.id },
                 data: {
                     writingAnswer: text,
+                },
+            });
+
+            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
+        }
+
+        else if (user.currentTask === TaskType.LISTENING) {
+            const text = ctx.message?.text;
+
+            await this.prisma.topicResult.update({
+                where: { id: result.id },
+                data: {
+                    listeningAnswer: text,
                 },
             });
 

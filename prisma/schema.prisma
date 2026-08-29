@@ -65,8 +65,8 @@ enum Step {
 }
 
 enum TaskType {
-  READING
   WRITING
+  READING
   LISTENING
   SPEAKING
 }
@@ -85,9 +85,9 @@ model TopicResult {
   level     Level
   topic     Int
 
-  readingAnswers      Int[]
   writingAnswer       String?
-  listeningAnswers    Int[]
+  readingAnswers      Int[]
+  listeningAnswer     String?
   speakingFile        String?
 
   updatedAt   DateTime?   @updatedAt  @db.Timestamptz(6)

@@ -38,7 +38,7 @@ export class TestHandler {
 
         q.answers.forEach((a, i) => {
             keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
-            if (i % 2 === 1) keyboard.row();
+            keyboard.row();
         });
 
         if (isAdditionalText) await ctx.reply(
@@ -66,18 +66,11 @@ export class TestHandler {
             (answer, index) => answer === TEST[index].correctAnswer
         ).length;
 
-        // const level =
-        //     score < 6 ? Level.A1 :
-        //         score < 11 ? Level.A2 :
-        //             score < 16 ? Level.B1 :
-        //                 score < 21 ? Level.B2
-        //                     : Level.C1;
-
         const level =
-            score < 2 ? Level.A1 :
-                score < 3 ? Level.A2 :
-                    score < 4 ? Level.B1 :
-                        score < 5 ? Level.B2
+            score < 6 ? Level.A1 :
+                score < 11 ? Level.A2 :
+                    score < 16 ? Level.B1 :
+                        score < 21 ? Level.B2
                             : Level.C1;
 
         await this.prisma.user.update({
