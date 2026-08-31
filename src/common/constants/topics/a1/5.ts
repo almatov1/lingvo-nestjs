@@ -180,7 +180,7 @@ export const A1_5_TOPIC: Topic = {
             ]
         }
     ],
-    listeningAudioPath: `src/assets/audio/A1-5_Киім-түстері.mp3`,
+    listeningAudioPath: `src/assets/audio/a1/A1-5_Киім-түстері.mp3`,
     listeningTitle: {
         kk: "Сөйлемді толықтырыңыз.",
         ru: "Дополните предложение.",

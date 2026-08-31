@@ -151,7 +151,7 @@ export const A1_3_TOPIC: Topic = {
             ]
         }
     ],
-    listeningAudioPath: `src/assets/audio/A1-3_Табиғаттың-тосын-сыйы.mp3`,
+    listeningAudioPath: `src/assets/audio/a1/A1-3_Табиғаттың-тосын-сыйы.mp3`,
     listeningTitle: {
         kk: "Сөйлемді толықтырыңыз.",
         ru: "Дополните предложение.",

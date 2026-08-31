@@ -204,7 +204,7 @@ export const A1_2_TOPIC: Topic = {
             ]
         }
     ],
-    listeningAudioPath: `src/assets/audio/A1-2_Менің-апталық-кестем.mp3`,
+    listeningAudioPath: `src/assets/audio/a1/A1-2_Менің-апталық-кестем.mp3`,
     listeningTitle: {
         kk: "Сөйлемді толықтырыңыз.",
         ru: "Дополните предложение.",

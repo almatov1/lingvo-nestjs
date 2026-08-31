@@ -224,7 +224,7 @@ export const A1_4_TOPIC: Topic = {
             ]
         }
     ],
-    listeningAudioPath: `src/assets/audio/A1-4_Менің-отбасым.mp3`,
+    listeningAudioPath: `src/assets/audio/a1/A1-4_Менің-отбасым.mp3`,
     listeningTitle: {
         kk: "Сөйлемді толықтырыңыз.",
         ru: "Дополните предложение.",
