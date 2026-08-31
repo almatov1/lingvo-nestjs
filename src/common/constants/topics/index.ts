@@ -1,6 +1,7 @@
 import { Level } from "src/generated/prisma/enums";
 import { A1_TOPICS } from "./a1";
 import { A2_TOPICS } from "./a2";
+import { B1_TOPICS } from "./b1";
 
 export interface Topic {
     title: {
@@ -42,7 +43,7 @@ export interface Topic {
 export const TOPICS: Record<Level, Topic[]> = {
     [Level.A1]: A1_TOPICS,
     [Level.A2]: A2_TOPICS,
-    [Level.B1]: [],
+    [Level.B1]: B1_TOPICS,
     [Level.B2]: [],
     [Level.C1]: []
 };
