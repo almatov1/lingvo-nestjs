@@ -69,6 +69,7 @@ jobs:
             docker run -d --name lingvo-nestjs --restart unless-stopped -p 3000:3000 \
               --network lingvo-net \
               -e DATABASE_URL="postgresql://${{ secrets.POSTGRESQL_USER }}:${{ secrets.POSTGRESQL_PASSWORD }}@postgres_lingvo:${{ secrets.POSTGRESQL_PORT }}/${{ secrets.POSTGRESQL_DB }}?schema=public" \
+              -e TELEGRAM_TOKEN="${{ secrets.TELEGRAM_TOKEN }}" \
               -v /var/lib/lingvo/storage:/usr/src/app/storage \
               ${{ secrets.DOCKER_USERNAME }}/lingvo-nestjs
               
