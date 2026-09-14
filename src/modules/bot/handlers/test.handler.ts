@@ -85,21 +85,20 @@ export class TestHandler {
                     reply_markup: keyboard
                 }
             );
+            else ctx.deleteMessage();
 
             if (material.type === TaskType.LISTENING) {
-                return ctx.editMessageMedia(
+                return await ctx.replyWithAudio(
+                    new InputFile(material.file),
                     {
-                        type: 'audio',
-                        media: new InputFile(material.file),
                         caption: `${questionNumber}. ${q.question}`,
-                        parse_mode: 'HTML'
-                    },
-                    { reply_markup: keyboard }
+                        parse_mode: 'HTML',
+                        reply_markup: keyboard
+                    }
                 );
             }
 
             if (material.type === TaskType.READING) {
-                await ctx.deleteMessage();
                 return ctx.reply(
                     dedent(`
                         ${material.text}
