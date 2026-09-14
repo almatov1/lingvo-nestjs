@@ -6,12 +6,13 @@ export default {
         <b>Registration</b>
         Before starting the lesson, let's get to know each other a little better.
         Please fill in the following information:
-        First name, last name:
-        Date of birth (day, month, year):
-        Nationality:
-        Place of work:
-        Permanent address:
-        Contact number:
+
+        🪪 First name, last name:
+        🎈 Date of birth:
+        🌎 Nationality:
+        🏢 Place of work:
+        📍 Permanent address:
+        📞 Contact number:
     `),
     test: dedent(`
         <b>Language Level Assessment</b>

@@ -25,6 +25,6 @@ export class RegistrationHandler {
             },
         });
 
-        await this.testHandler.sendQuestion(ctx, 0, this.i18n.t('test', user.language));
+        await this.testHandler.sendQuestion(ctx, user, 0);
     }
 }
