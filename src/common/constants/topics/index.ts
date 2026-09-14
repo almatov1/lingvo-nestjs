@@ -22,11 +22,13 @@ export interface Topic {
         en: string;
     };
     writing: string;
+    writingAnswer: string;
     reading: string;
     readingTest: {
         question: string;
         answers: string[];
     }[];
+    readingAnswer: string;
     listeningAudioPath: string;
     listeningTitle: {
         kk: string;
@@ -34,12 +36,14 @@ export interface Topic {
         en: string;
     };
     listening: string;
+    listeningAnswer: string;
     speakingTitle: {
         kk: string;
         ru: string;
         en: string;
     };
     speaking: string;
+    speakingAnswer: string;
 }
 
 export const TOPICS: Record<Level, Topic[]> = {

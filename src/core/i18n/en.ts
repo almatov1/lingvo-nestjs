@@ -60,61 +60,6 @@ export default {
         📘 Facebook page: <a href="https://www.facebook.com/tilderdi.oqytu.ortalygy/about">Тілдерді оқыту орталығы</a>
         🎥 YouTube channel: <a href="https://www.youtube.com/@tilaqtobe">Тілдерді оқыту орталығы</a>
     `),
-    onlineFormat: dedent(`
-        <b>We offer you the following learning topics:</b>
-    `),
-    lockedTopic: 'This lesson is not available. Complete previous topics or move to the next one.',
-    topic: dedent(`<b>In this lesson, we learn the language through 4 skills:</b>`),
-    writing: dedent(`
-        <b>Writing</b>
-        Now, try to express your thoughts in writing.
-        Complete a short writing task on the topic.
-        Don't be afraid of making mistakes — we learn through practice!    
-    `),
-    reading: dedent(`
-        <b>Reading</b>
-        Read the short text.
-        After reading, try to complete the tasks.
-        Take your time — understanding what you read is what matters.
-    `),
-    listening: dedent(`
-        <b>Listening</b>
-        Now, let's listen to the audio. 🎧
-        Listen to the text carefully and try to catch the main idea.
-        Then, try to complete the tasks.
-        Don't worry — with every listening practice, your language skills get better! 🌟
-    `),
-    speaking: dedent(`
-        <b>Speaking</b>
-        Try to answer the questions orally.
-        Try to speak freely.
-        The main thing is to strive to express your thoughts in Kazakh.
-        You can definitely do it! 🌟
-    `),
-    finishTopic: dedent(`
-        <b>Summary</b>
-        Well done! 🎉
-        You have successfully completed all the tasks on this topic!
-        Give yourself a round of applause 👏
-        Now you are ready to move on to the next topic!
-    `),
-    menu: {
-        title: "Menu",
-        topics: "📚 Topics",
-        back: "⬅️ Back",
-        reading: "Reading",
-        writing: "Writing",
-        listening: "Listening",
-        speaking: "Speaking",
-        toolbox: "🌐 Language toolbox"
-    },
-    lockedTask: 'This task is not available. Complete previous tasks or move to the next one.',
-    finishedTask: dedent(`
-        <b>Well done! 🎉</b>
-        You have successfully completed all the tasks on this task!
-        Give yourself a round of applause 👏
-        Now you are ready to move on to the next task!
-    `),
     toolbox: dedent(`
         <b>🌐 Language toolbox:</b> 
         <a href="https://tilqazyna.kz">Тіл-Қазына</a>
@@ -125,5 +70,21 @@ export default {
         <a href="https://termincom.kz/about">Терминдер</a>
         <a href="https://sozdikqor.kz">Сөздікқор</a>
         <a href="https://abai.institute/?school=05125">Қазақ тілін онлайн үйрену</a>
-    `)
+    `),
+    menu: {
+        title: "📋 Menu",
+        topics: "📶 Levels",
+        toolbox: "🌐 Language toolbox",
+        description: "🔠 New words and grammar",
+        writing: "✍️ Writing",
+        reading: "📖 Reading",
+        listening: "🎧 Listening",
+        speaking: "🗣️ Speaking",
+        tasks: "📚 Lessons",
+        goBack: "⬅️ Go back"
+    },
+    lockedLevel: 'This level is unavailable. Complete the previous levels.',
+    topic: "lesson",
+    yourAnswer: "Your answer",
+    correctlyAnswer: "Correctly answer"
 } as const;

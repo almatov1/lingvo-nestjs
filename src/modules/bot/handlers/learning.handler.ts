@@ -4,9 +4,10 @@ import { TOPICS } from 'src/common/constants/topics'
 import { I18nService } from 'src/core/i18n/i18n.service'
 import { PrismaService } from 'src/core/prisma/prisma.service'
 import { StorageService } from 'src/core/storage/storage.service'
-import { OnlineScreen, TaskType, TopicResult, User } from 'src/generated/prisma/client'
+import { Level, OnlineScreen, TaskType, TopicResult, User } from 'src/generated/prisma/client'
 import dedent from 'dedent';
 import { VARIANT_LABEL } from 'src/common/constants/test'
+import { capitalizeFirstLetter } from 'src/core/utils/capitalize'
 
 @Injectable()
 export class LearningHandler {
@@ -16,6 +17,16 @@ export class LearningHandler {
         private readonly i18n: I18nService
     ) { }
 
+    private readonly LEVELS = [
+        Level.A1,
+        Level.A2,
+        Level.B1,
+        Level.B2,
+        Level.C1
+    ];
+
+    // MENU
+
     async openMenu(ctx: Context, user: User) {
         await this.prisma.user.update({
             where: { id: user.id },
@@ -23,7 +34,7 @@ export class LearningHandler {
         });
 
         const keyboard = new InlineKeyboard()
-            .text(this.i18n.t('menu.topics', user.language), 'menu_topics')
+            .text(this.i18n.t('menu.levels', user.language), 'menu_levels')
             .row()
             .text(this.i18n.t('menu.toolbox', user.language), 'menu_toolbox');
 
@@ -33,56 +44,78 @@ export class LearningHandler {
         );
     }
 
-    async showTopics(ctx: Context, user: User) {
-        if (!user.level) return;
-        const topics = TOPICS[user.level];
+    // LEVELS
 
-        const results = await this.prisma.topicResult.findMany({
-            where: {
-                userId: user.id,
-                level: user.level,
-            },
-        });
-        const completed = new Set(
-            results
-                .filter(r => r.speakingFile)
-                .map(r => r.topic)
-        );
+    async showLevels(ctx: Context, user: User) {
+        if (!user.level) return;
 
         const keyboard = new InlineKeyboard();
 
-        topics.forEach((topic, index) => {
-            const unlocked =
-                index === 0 || completed.has(index - 1);
-            const done = completed.has(index);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { uiScreen: OnlineScreen.LEVELS }
+        });
+
+        const userLevelIndex = this.LEVELS.findIndex(l => l === user.level);
+
+        this.LEVELS.forEach((level, index) => {
+            const locked = index > userLevelIndex;
 
             keyboard.text(
-                done
-                    ? `✅ ${index + 1}. ${topic.title[user.language]}`
-                    : unlocked
-                        ? `${index + 1}. ${topic.title[user.language]}`
-                        : `🔒 ${index + 1}. ${topic.title[user.language]}`,
-                unlocked && !done ? `topic_${index}` : 'topic_locked'
+                level,
+                locked ? 'level_locked' : `level_${level}`
             );
             keyboard.row();
         });
 
         keyboard
-            .text(this.i18n.t('menu.back', user.language), 'menu_back')
-
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { uiScreen: OnlineScreen.TOPICS }
-        });
+            .text(this.i18n.t('menu.title', user.language), 'menu_back');
 
         await ctx.editMessageText(
-            this.i18n.t('onlineFormat', user.language),
+            this.i18n.t('menu.levels', user.language),
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
             }
         );
     }
+
+    // TOPICS
+
+    async openLevel(ctx: Context, user: User, level: Level) {
+        const topics = TOPICS[level];
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                currentLevel: level,
+                uiScreen: OnlineScreen.TOPICS
+            }
+        });
+
+        const keyboard = new InlineKeyboard();
+
+        topics.forEach((_, index) => {
+            keyboard.text(
+                `${index + 1}-${this.i18n.t('menu.topic', user.language)}`,
+                `topic_${index}`
+            );
+            keyboard.row();
+        });
+
+        keyboard
+            .text(this.i18n.t('menu.levels', user.language), 'menu_back');
+
+        await ctx.editMessageText(
+            this.i18n.t('menu.topics', user.language),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+    }
+
+    // TOOLBOX
 
     async showToolbox(ctx: Context, user: User) {
         const keyboard = new InlineKeyboard();
@@ -91,7 +124,7 @@ export class LearningHandler {
 
         await this.prisma.user.update({
             where: { id: user.id },
-            data: { uiScreen: OnlineScreen.TOPICS }
+            data: { uiScreen: OnlineScreen.LEVELS }
         });
 
         await ctx.editMessageText(
@@ -103,109 +136,144 @@ export class LearningHandler {
         );
     }
 
-    async openTopic({ ctx, user, topicIndex, isTaskFinish, isReply }: { ctx: Context, user: User, topicIndex: number, isTaskFinish?: boolean, isReply?: boolean }) {
-        const result = await this.prisma.topicResult.findFirst({
-            where: {
-                userId: user.id,
-                level: user.level!,
-                topic: topicIndex,
-            },
-        });
+    // TASKS
 
-        if (!result) await this.prisma.topicResult.upsert({
-            where: {
-                userId_level_topic: {
-                    userId: user.id,
-                    level: user.level!,
-                    topic: topicIndex,
-                },
-            },
-            create: {
-                userId: user.id,
-                level: user.level!,
-                topic: topicIndex,
-                readingAnswers: []
-            },
-            update: {},
-        });
-
-        const writingDone = !!result?.writingAnswer;
-        const readingDone = !!result?.readingAnswers?.length;
-        const listeningDone = !!result?.listeningAnswer;
-        const speakingDone = !!result?.speakingFile;
-
-        const writingIcon = "✍️";
-        const readingIcon = "📖";
-        const listeningIcon = "🎧";
-        const speakingIcon = "🗣️";
-
+    async openTopic(ctx: Context, user: User, topicIndex: number) {
         const keyboard = new InlineKeyboard();
 
         keyboard.text(
-            `${writingDone ? '✅' : writingIcon} ${this.i18n.t('menu.writing', user.language)}`,
-            writingDone ? 'task_locked' : 'lesson_writing'
-        );
-
-        keyboard.text(
-            `${!writingDone ? '🔒' : readingDone ? '✅' : readingIcon} ${this.i18n.t('menu.reading', user.language)}`,
-            !writingDone || readingDone ? 'task_locked' : 'lesson_reading'
+            this.i18n.t('menu.description', user.language),
+            'task_description'
         );
 
         keyboard.row();
 
         keyboard.text(
-            `${!readingDone ? '🔒' : listeningDone ? '✅' : listeningIcon} ${this.i18n.t('menu.listening', user.language)}`,
-            !readingDone || listeningDone ? 'task_locked' : 'lesson_listening'
+            this.i18n.t('menu.writing', user.language),
+            'task_writing'
         );
 
         keyboard.text(
-            `${!listeningDone ? '🔒' : speakingDone ? '✅' : speakingIcon} ${this.i18n.t('menu.speaking', user.language)}`,
-            !listeningDone || speakingDone ? 'task_locked' : 'lesson_speaking'
+            this.i18n.t('menu.reading', user.language),
+            'task_reading'
         );
 
         keyboard.row();
 
-        keyboard.text(this.i18n.t('menu.back', user.language), 'menu_back')
+        keyboard.text(
+            this.i18n.t('menu.listening', user.language),
+            'task_listening'
+        );
+
+        keyboard.text(
+            this.i18n.t('menu.speaking', user.language),
+            'task_speaking'
+        );
+
+        keyboard.row();
+
+        keyboard.text(this.i18n.t('menu.tasks', user.language), 'menu_back');
 
         await this.prisma.user.update({
             where: { id: user.id },
             data: {
                 currentTopic: topicIndex,
-                uiScreen: OnlineScreen.LESSON
+                currentTask: undefined,
+                uiScreen: OnlineScreen.TASK
             }
         });
 
-        if (isReply) await ctx.reply(
-            dedent(`
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title[user.language]}
+        try { await ctx.deleteMessage() }
+        catch { }
 
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].description[user.language]}
+        await ctx.reply(
+            `${topicIndex + 1}. ${capitalizeFirstLetter(TOPICS[user.currentLevel!][topicIndex].title[user.language])}`,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+    }
 
-                ${isTaskFinish
-                    ? `${this.i18n.t('finishedTask', user.language)}
-                    
-                    `
-                    : ''}
-                ${this.i18n.t('topic', user.language)}
+    // DESCRIPTION
+
+    async onDescription(ctx: Context, user: User) {
+        const keyboard = new InlineKeyboard();
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'menu_back');
+
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        try { await ctx.deleteMessage() }
+        catch { }
+
+        await ctx.replyWithDocument(
+            new InputFile(topic.description[user.language]),
+            { reply_markup: keyboard }
+        );
+    }
+
+    // WRITING
+
+    async startWriting(ctx: Context, user: User) {
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.currentLevel!,
+                topic: user.currentTopic!,
+            },
+        }) as TopicResult;
+
+        if (result.writingAnswer) await this.writingResult(ctx, user, false);
+        else {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { currentTask: TaskType.WRITING }
+            });
+
+            await ctx.reply(
+                dedent(`
+                ${topic.writingTitle[user.language]}
+
+                ${topic.writing}
             `),
+                { parse_mode: 'HTML' }
+            );
+        }
+    }
+
+    async writingResult(ctx: Context, user: User, isReply: boolean) {
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.currentLevel!,
+                topic: user.currentTopic!,
+            },
+        }) as TopicResult;
+
+        const text = dedent(`
+            ${this.i18n.t('yourAnswer', user.language)}:
+            ${result.writingAnswer}
+
+            ${this.i18n.t('correctlyAnswer', user.language)}:
+            ${topic.writingAnswer}
+        `);
+
+        const keyboard = new InlineKeyboard();
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'menu_back');
+
+        if (isReply) await ctx.reply(
+            text,
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
             }
         );
         else await ctx.editMessageText(
-            dedent(`
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].title[user.language]}
-
-                ${topicIndex + 1}. ${TOPICS[user.level!][topicIndex].description[user.language]}
-
-                ${isTaskFinish
-                    ? `${this.i18n.t('finishedTask', user.language)}
-                    
-                    `
-                    : ''}
-                ${this.i18n.t('topic', user.language)}
-            `),
+            text,
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
@@ -213,125 +281,227 @@ export class LearningHandler {
         );
     }
 
-    async startWriting(ctx: Context, user: User) {
-        const result = await this.prisma.topicResult.findFirst({
-            where: {
-                userId: user.id,
-                level: user.level!,
-                topic: user.currentTopic!
-            },
-        });
-        const topic = TOPICS[user.level!][result?.topic!];
-
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { currentTask: TaskType.WRITING }
-        });
-
-        await ctx.editMessageText(
-            dedent(`
-                ${this.i18n.t('writing', user.language)}
-
-                ${topic.writingTitle[user.language]}
-
-                ${topic.writing}
-            `),
-            { parse_mode: 'HTML' }
-        );
-    }
+    // READING
 
     async startReading(ctx: Context, user: User) {
         const result = await this.prisma.topicResult.findFirst({
             where: {
                 userId: user.id,
-                level: user.level!,
+                level: user.currentLevel!,
                 topic: user.currentTopic!
             },
         });
-        const topic = TOPICS[user.level!][result?.topic!];
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
 
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { currentTask: TaskType.READING }
-        });
+        if (result?.readingAnswer.length === topic.readingTest.length) await this.readingResult(ctx, user, false);
+        else {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { currentTask: TaskType.READING }
+            });
+
+            const keyboard = new InlineKeyboard();
+
+            const q = topic.readingTest[result?.readingAnswer.length!];
+            topic.readingTest[result?.readingAnswer.length!].answers.forEach((a, i) => {
+                keyboard.text(`${VARIANT_LABEL[i]} ${a}`, a);
+                keyboard.row();
+            });
+
+            await ctx.editMessageText(
+                dedent(`
+                    ${topic.reading}
+
+                    ${q.question}
+                `),
+                {
+                    parse_mode: 'HTML',
+                    reply_markup: keyboard
+                })
+        }
+    }
+
+    async readingResult(ctx: Context, user: User, isReply: boolean) {
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.currentLevel!,
+                topic: user.currentTopic!,
+            },
+        }) as TopicResult;
+
+        const formattedAnswers = (result.readingAnswer as string[])
+            .map((ans, idx) => `${idx + 1}. ${ans}`)
+            .join('\n');
+        const text = dedent(`
+            ${this.i18n.t('yourAnswer', user.language)}:
+            ${formattedAnswers}
+
+            ${this.i18n.t('correctlyAnswer', user.language)}:
+            ${topic.readingAnswer}
+        `);
 
         const keyboard = new InlineKeyboard();
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'menu_back');
 
-        const q = topic.readingTest[result?.readingAnswers.length!];
-        topic.readingTest[result?.readingAnswers.length!].answers.forEach((a, i) => {
-            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
-            keyboard.row();
-        });
-
-        if (result?.readingAnswers.length! === 0) {
-            await ctx.editMessageText(dedent(`
-                ${this.i18n.t('reading', user.language)}
-
-                ${topic.reading}
-            `), { parse_mode: 'HTML' });
-            await ctx.reply(q.question, { reply_markup: keyboard });
-        }
-        else await ctx.editMessageText(q.question, { reply_markup: keyboard });
+        if (isReply) await ctx.reply(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+        else await ctx.editMessageText(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
     }
+
+    // LISTENING
 
     async startListening(ctx: Context, user: User) {
         const result = await this.prisma.topicResult.findFirst({
             where: {
                 userId: user.id,
-                level: user.level!,
+                level: user.currentLevel!,
                 topic: user.currentTopic!
             },
         });
-        const topic = TOPICS[user.level!][result?.topic!];
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
 
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { currentTask: TaskType.LISTENING }
-        });
+        if (result?.listeningAnswer) await this.listeningResult(ctx, user, false);
+        else {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { currentTask: TaskType.LISTENING }
+            });
 
-        await ctx.editMessageText(
-            dedent(`
-                ${this.i18n.t('listening', user.language)}
-            `),
-            { parse_mode: 'HTML' }
+            try { await ctx.deleteMessage() }
+            catch { }
+
+            await ctx.replyWithAudio(
+                new InputFile(topic.listeningAudioPath),
+                {
+                    caption: dedent(`
+                        ${topic.listeningTitle[user.language]}
+
+                        ${topic.listening}
+                    `),
+                    parse_mode: 'HTML'
+                }
+            );
+        }
+    }
+
+    async listeningResult(ctx: Context, user: User, isReply: boolean) {
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.currentLevel!,
+                topic: user.currentTopic!,
+            },
+        }) as TopicResult;
+
+        const text = dedent(`
+            ${this.i18n.t('yourAnswer', user.language)}:
+            ${result.listeningAnswer}
+
+            ${this.i18n.t('correctlyAnswer', user.language)}:
+            ${topic.listeningAnswer}
+        `);
+
+        const keyboard = new InlineKeyboard();
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'menu_back');
+
+        if (isReply) await ctx.reply(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
         );
-        await ctx.replyWithAudio(new InputFile(topic.listeningAudioPath));
-        await ctx.reply(
-            dedent(`
-                ${topic.listeningTitle[user.language]}
-
-                ${topic.listening}
-            `),
-            { parse_mode: 'HTML' },
+        else await ctx.editMessageText(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
         );
     }
+
+    // SPEAKING
 
     async startSpeaking(ctx: Context, user: User) {
         const result = await this.prisma.topicResult.findFirst({
             where: {
                 userId: user.id,
-                level: user.level!,
+                level: user.currentLevel!,
                 topic: user.currentTopic!
             },
         });
-        const topic = TOPICS[user.level!][result?.topic!];
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
 
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { currentTask: TaskType.SPEAKING }
-        });
+        if (result?.speakingFile) await this.speakingResult(ctx, user, false);
+        else {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { currentTask: TaskType.SPEAKING }
+            });
 
-        await ctx.editMessageText(
-            dedent(`
-                ${this.i18n.t('speaking', user.language)}
+            await ctx.editMessageText(
+                dedent(`
+                    ${topic.speakingTitle[user.language]}
 
-                ${topic.speakingTitle[user.language]}
+                    ${topic.speaking}
+                `),
+                { parse_mode: 'HTML' }
+            );
+        }
+    }
 
-                ${topic.speaking}
-            `),
-            { parse_mode: 'HTML' }
+    async speakingResult(ctx: Context, user: User, isReply: boolean) {
+        const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+
+        // const result = await this.prisma.topicResult.findFirst({
+        //     where: {
+        //         userId: user.id,
+        //         level: user.currentLevel!,
+        //         topic: user.currentTopic!,
+        //     },
+        // }) as TopicResult;
+
+        const text = dedent(`
+            ${this.i18n.t('correctlyAnswer', user.language)}:
+            ${topic.speakingAnswer}
+        `);
+
+        const keyboard = new InlineKeyboard();
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'menu_back');
+
+        if (isReply) await ctx.reply(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
+        else await ctx.editMessageText(
+            text,
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
         );
     }
+
+    // CALLBACK
 
     async handleCallback(ctx: Context, user: User) {
         const data = ctx.callbackQuery?.data;
@@ -340,68 +510,75 @@ export class LearningHandler {
 
         // MENU SCREEN
         if (user.uiScreen === OnlineScreen.MENU) {
-            if (data === 'menu_topics')
-                return this.showTopics(ctx, user);
+            if (data === 'menu_levels')
+                return this.showLevels(ctx, user);
             else if (data === 'menu_toolbox')
                 return this.showToolbox(ctx, user);
+            return;
+        }
+
+        // LEVELS SCREEN
+        if (user.uiScreen === OnlineScreen.LEVELS) {
+            if (data === 'menu_back')
+                return this.openMenu(ctx, user);
+
+            if (data === 'level_locked') {
+                await ctx.answerCallbackQuery({
+                    text: this.i18n.t('lockedLevel', user.language),
+                    show_alert: true,
+                });
+                return;
+            }
+
+            if (data.startsWith('level_')) {
+                const level = data.split('_')[1];
+                return this.openLevel(ctx, user, Level[level]);
+            }
+
             return;
         }
 
         // TOPICS SCREEN
         if (user.uiScreen === OnlineScreen.TOPICS) {
             if (data === 'menu_back')
-                return this.openMenu(ctx, user);
-
-            if (data === 'topic_locked') {
-                await ctx.answerCallbackQuery({
-                    text: this.i18n.t('lockedTopic', user.language),
-                    show_alert: true,
-                });
-                return;
-            }
+                return this.showLevels(ctx, user);
 
             if (data.startsWith('topic_')) {
                 const topicIndex = Number(data.split('_')[1]);
                 if (Number.isNaN(topicIndex)) return;
 
-                return this.openTopic({ ctx, user, topicIndex });
+                return this.openTopic(ctx, user, topicIndex);
             }
 
             return;
         }
 
-        // LESSONG SCREEN
-        if (user.uiScreen === OnlineScreen.LESSON) {
-            if (data === 'menu_back') return this.showTopics(ctx, user);
+        // TASK SCREEN
+        if (user.uiScreen === OnlineScreen.TASK) {
+            if (data === 'menu_back') return this.openTopic(ctx, user, user.currentTopic!);
 
             switch (data) {
-                case 'lesson_writing':
+                case 'task_description':
+                    return this.onDescription(ctx, user);
+
+                case 'task_writing':
                     return this.startWriting(ctx, user);
 
-                case 'lesson_reading':
+                case 'task_reading':
                     return this.startReading(ctx, user);
 
-                case 'lesson_listening':
+                case 'task_listening':
                     return this.startListening(ctx, user);
 
-                case 'lesson_speaking':
+                case 'task_speaking':
                     return this.startSpeaking(ctx, user);
-
-                case 'task_locked':
-                    await ctx.answerCallbackQuery({
-                        text: this.i18n.t('lockedTask', user.language),
-                        show_alert: true,
-                    });
-                    return;
             }
 
             if (user.currentTask === TaskType.READING) {
-                if (!/^\d+$/.test(data)) return;
-
                 await ctx.answerCallbackQuery();
 
                 const topicIndex = user.currentTopic!;
-                const level = user.level!;
+                const level = user.currentLevel!;
 
                 const result = await this.prisma.topicResult.findFirst({
                     where: {
@@ -412,14 +589,25 @@ export class LearningHandler {
                 });
                 const topic = TOPICS[level][topicIndex];
 
-                const answerIndex = Number(data);
                 const updatedAnswers = [
-                    ...(result!.readingAnswers ?? []),
-                    answerIndex
+                    ...(result?.readingAnswer ?? []),
+                    data
                 ];
-                await this.prisma.topicResult.update({
-                    where: { id: result!.id },
-                    data: { readingAnswers: updatedAnswers },
+                await this.prisma.topicResult.upsert({
+                    where: {
+                        userId_level_topic: {
+                            userId: user.id,
+                            level,
+                            topic: topicIndex,
+                        },
+                    },
+                    update: { readingAnswer: updatedAnswers },
+                    create: {
+                        userId: user.id,
+                        level,
+                        topic: topicIndex,
+                        readingAnswer: updatedAnswers
+                    }
                 });
 
                 const nextIndex = updatedAnswers.length;
@@ -428,64 +616,65 @@ export class LearningHandler {
                     return;
                 }
 
-                await this.prisma.user.update({
-                    where: { id: user.id },
-                    data: {
-                        currentTask: null,
-                    },
-                });
-                await this.openTopic({ ctx, user, topicIndex, isTaskFinish: true });
+                await this.checkRaising(user);
+                await this.readingResult(ctx, user, true);
                 return;
             }
         }
     }
 
     async handle(ctx: Context, user: User) {
-        const result = await this.prisma.topicResult.findFirst({
-            where: {
-                userId: user.id,
-                level: user.level!,
-                topic: user.currentTopic!,
-            },
-        }) as TopicResult;
-
         if (user.currentTask === TaskType.WRITING) {
             const text = ctx.message?.text;
 
-            await this.prisma.topicResult.update({
-                where: { id: result.id },
-                data: {
-                    writingAnswer: text,
+            await this.prisma.topicResult.upsert({
+                where: {
+                    userId_level_topic: {
+                        userId: user.id,
+                        level: user.currentLevel!,
+                        topic: user.currentTopic!,
+                    },
+                },
+                update: { writingAnswer: text },
+                create: {
+                    userId: user.id,
+                    level: user.currentLevel!,
+                    topic: user.currentTopic!,
+                    writingAnswer: text
                 },
             });
 
-            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
+            await this.checkRaising(user);
+            await this.writingResult(ctx, user, true);
         }
 
         else if (user.currentTask === TaskType.LISTENING) {
             const text = ctx.message?.text;
 
-            await this.prisma.topicResult.update({
-                where: { id: result.id },
-                data: {
+            await this.prisma.topicResult.upsert({
+                where: {
+                    userId_level_topic: {
+                        userId: user.id,
+                        level: user.currentLevel!,
+                        topic: user.currentTopic!,
+                    },
+                },
+                update: { listeningAnswer: text },
+                create: {
+                    userId: user.id,
+                    level: user.currentLevel!,
+                    topic: user.currentTopic!,
                     listeningAnswer: text,
                 },
             });
 
-            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
+            await this.checkRaising(user);
+            await this.listeningResult(ctx, user, true);
         }
 
         else if (user.currentTask === TaskType.SPEAKING) {
             const voice = ctx.message?.voice;
             if (!voice) return;
-
-            const result = await this.prisma.topicResult.findFirst({
-                where: {
-                    userId: user.id,
-                    level: user.level!,
-                    topic: user.currentTopic!,
-                },
-            }) as TopicResult;
 
             const file = await ctx.api.getFile(voice.file_id);
             const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_TOKEN}/${file.file_path}`;
@@ -496,14 +685,68 @@ export class LearningHandler {
                 buffer,
             } as any);
 
-            await this.prisma.topicResult.update({
-                where: { id: result.id },
-                data: {
+            await this.prisma.topicResult.upsert({
+                where: {
+                    userId_level_topic: {
+                        userId: user.id,
+                        level: user.currentLevel!,
+                        topic: user.currentTopic!,
+                    },
+                },
+                update: { speakingFile: filename },
+                create: {
+                    userId: user.id,
+                    level: user.currentLevel!,
+                    topic: user.currentTopic!,
                     speakingFile: filename
                 },
             });
 
-            await this.openTopic({ ctx, user, topicIndex: user.currentTopic!, isTaskFinish: true, isReply: true });
+            await this.checkRaising(user);
+            await this.speakingResult(ctx, user, true);
         }
+    }
+
+    // CHECK RAISING
+
+    async checkRaising(user: User) {
+        if (!user.level || !user.currentLevel) return;
+
+        const currentLevelIndex = this.LEVELS.findIndex(
+            level => level === user.currentLevel
+        );
+
+        if (currentLevelIndex >= this.LEVELS.length - 1) return;
+
+        const topics = TOPICS[user.currentLevel];
+
+        const results = await this.prisma.topicResult.findMany({
+            where: {
+                userId: user.id,
+                level: user.currentLevel,
+            },
+        });
+
+        const completed = topics.every((topic, index) => {
+            const result = results.find(r => r.topic === index);
+
+            if (!result) return false;
+
+            return (
+                !!result.writingAnswer &&
+                result.readingAnswer.length === topic.readingTest.length &&
+                !!result.listeningAnswer &&
+                !!result.speakingFile
+            );
+        });
+
+        if (!completed) return;
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                level: this.LEVELS[currentLevelIndex + 1],
+            },
+        });
     }
 }

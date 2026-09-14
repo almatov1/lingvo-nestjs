@@ -77,15 +77,16 @@ export class TestHandler {
                     caption: dedent(`
                         ${this.i18n.t('test', user.language)}
 
-                        ${this.i18n.t('menu.listening', user.language)}
-
                         ${questionNumber}. ${q.question}
                     `),
                     parse_mode: 'HTML',
                     reply_markup: keyboard
                 }
             );
-            else ctx.deleteMessage();
+            else {
+                try { await ctx.deleteMessage() }
+                catch { }
+            }
 
             if (material.type === TaskType.LISTENING) {
                 return await ctx.replyWithAudio(

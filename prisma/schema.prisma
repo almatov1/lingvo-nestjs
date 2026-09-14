@@ -24,6 +24,7 @@ model User {
   currentStep   Step        @default(CHOOSE_LANGUAGE)
   testAnswers   Int[]
 
+  currentLevel    Level?
   currentTopic    Int?
   currentTask     TaskType?
 
@@ -73,8 +74,9 @@ enum TaskType {
 
 enum OnlineScreen {
   MENU
+  LEVELS
   TOPICS
-  LESSON
+  TASK
   TASKS
 }
 
@@ -86,7 +88,7 @@ model TopicResult {
   topic     Int
 
   writingAnswer       String?
-  readingAnswers      Int[]
+  readingAnswer       String[]
   listeningAnswer     String?
   speakingFile        String?
 
