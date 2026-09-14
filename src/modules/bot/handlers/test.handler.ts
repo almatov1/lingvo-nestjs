@@ -66,33 +66,86 @@ export class TestHandler {
 
         const material = this.MATERIALS[index];
 
+        const questionNumber = index < 20
+            ? index + 1
+            : index - 19;
+
         if (material) {
-            if (index !== 0) await ctx.deleteMessage();
-            else await ctx.reply(
-                this.i18n.t('test', user.language),
-                { parse_mode: 'HTML' }
+            if (index === 0) return await ctx.replyWithAudio(
+                new InputFile(material.file),
+                {
+                    caption: dedent(`
+                        ${this.i18n.t('test', user.language)}
+
+                        ${this.i18n.t('menu.listening', user.language)}
+
+                        ${questionNumber}. ${q.question}
+                    `),
+                    parse_mode: 'HTML',
+                    reply_markup: keyboard
+                }
             );
 
             if (material.type === TaskType.LISTENING) {
-                await ctx.replyWithAudio(
-                    new InputFile(material.file),
-                    { parse_mode: 'HTML' }
+                return ctx.editMessageMedia(
+                    {
+                        type: 'audio',
+                        media: new InputFile(material.file),
+                        caption: `${questionNumber}. ${q.question}`,
+                        parse_mode: 'HTML'
+                    },
+                    { reply_markup: keyboard }
                 );
-            } else await ctx.reply(
-                material.text,
-                { parse_mode: 'HTML' }
-            );
+            }
 
-            return ctx.reply(`${index + 1}. ${q.question}`, {
+            if (material.type === TaskType.READING) {
+                await ctx.deleteMessage();
+                return ctx.reply(
+                    dedent(`
+                        ${material.text}
+
+                        ${questionNumber}. ${q.question}
+                    `),
+                    {
+                        parse_mode: 'HTML',
+                        reply_markup: keyboard,
+                    },
+                );
+            }
+        }
+
+        if (index < 20) {
+            return ctx.editMessageCaption({
+                caption: `${questionNumber}. ${q.question}`,
                 parse_mode: 'HTML',
                 reply_markup: keyboard,
             });
         }
 
-        return ctx.editMessageText(`${index + 1}. ${q.question}`, {
-            parse_mode: 'HTML',
-            reply_markup: keyboard,
-        });
+        const readingMaterial = Object.entries(this.MATERIALS)
+            .reverse()
+            .find(
+                ([materialIndex, material]) =>
+                    material.type === TaskType.READING &&
+                    Number(materialIndex) <= index,
+            );
+
+        const readingText =
+            readingMaterial?.[1].type === TaskType.READING
+                ? readingMaterial[1].text
+                : '';
+
+        return ctx.editMessageText(
+            dedent(`
+                ${readingText}
+
+                ${questionNumber}. ${q.question}
+            `),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard,
+            },
+        );
     }
 
     private async finishTest(ctx: Context, user: User) {
