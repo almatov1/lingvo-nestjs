@@ -6,7 +6,7 @@ import { PrismaService } from 'src/core/prisma/prisma.service'
 import { StorageService } from 'src/core/storage/storage.service'
 import { Level, OnlineScreen, TaskType, TopicResult, User } from 'src/generated/prisma/client'
 import dedent from 'dedent';
-import { VARIANT_LABEL } from 'src/common/constants/test'
+import { VARIANT_LABEL_LOWER_CASE } from 'src/common/constants/test'
 import { capitalizeFirstLetter } from 'src/core/utils/capitalize'
 
 @Injectable()
@@ -60,13 +60,14 @@ export class LearningHandler {
 
         this.LEVELS.forEach((level, index) => {
             const locked = index > userLevelIndex;
+            let icon = '';
+
+            if (locked) icon = '🔒'
+            else if (index < userLevelIndex) icon = '✅'
+            else if (index === userLevelIndex) icon = user.isLevelCompleted ? '✅' : '✍️';
 
             keyboard.text(
-                locked
-                    ? `🔒 ${level}`
-                    : userLevelIndex === index
-                        ? `✍️ ${level}`
-                        : `✅ ${level}`,
+                `${icon} ${level}`,
                 locked ? 'level_locked' : `level_${level}`
             );
             keyboard.row();
@@ -106,17 +107,27 @@ export class LearningHandler {
 
         const keyboard = new InlineKeyboard();
 
+        let inProgressShown = false;
         topics.forEach((topic, index) => {
             const topicResult = results.find(r => r.topic === index);
 
-            keyboard.text(
+            const isCompleted =
                 topicResult
-                    && topicResult.writingAnswer
-                    && topicResult.readingAnswer.length === topic.readingTest.length
-                    && topicResult.listeningAnswer
-                    && topicResult.speakingFile
-                    ? `✅ ${index + 1}-${this.i18n.t('topic', user.language)}`
-                    : `${index + 1}-${this.i18n.t('topic', user.language)}`,
+                && topicResult.writingAnswer
+                && topicResult.readingAnswer.length === topic.readingTest.length
+                && topicResult.listeningAnswer
+                && topicResult.speakingFile;
+
+            let icon = '';
+
+            if (isCompleted) icon = '✅';
+            else if (!inProgressShown) {
+                icon = '✍️';
+                inProgressShown = true;
+            }
+
+            keyboard.text(
+                `${icon ? `${icon} ` : ''}${index + 1}-${this.i18n.t('topic', user.language)}`,
                 `topic_${index}`
             );
             keyboard.row();
@@ -341,7 +352,7 @@ export class LearningHandler {
 
             const q = topic.readingTest[result?.readingAnswer.length!];
             topic.readingTest[result?.readingAnswer.length!].answers.forEach((a, i) => {
-                keyboard.text(`${VARIANT_LABEL[i]} ${a}`, a);
+                keyboard.text(`${VARIANT_LABEL_LOWER_CASE[i]} ${a}`, a);
                 keyboard.row();
             });
 
@@ -754,8 +765,6 @@ export class LearningHandler {
             level => level === user.currentLevel
         );
 
-        if (currentLevelIndex >= this.LEVELS.length - 1) return;
-
         const topics = TOPICS[user.currentLevel];
 
         const results = await this.prisma.topicResult.findMany({
@@ -779,6 +788,15 @@ export class LearningHandler {
         });
 
         if (!completed) return;
+
+        if (currentLevelIndex >= this.LEVELS.length - 1) {
+            await this.prisma.user.update({
+                where: { id: user.id },
+                data: { isLevelCompleted: true },
+            });
+
+            return;
+        }
 
         await this.prisma.user.update({
             where: { id: user.id },

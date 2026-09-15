@@ -14,7 +14,7 @@ CREATE TYPE "Step" AS ENUM ('CHOOSE_LANGUAGE', 'REGISTRATION', 'PLACEMENT_TEST',
 CREATE TYPE "TaskType" AS ENUM ('WRITING', 'READING', 'LISTENING', 'SPEAKING');
 
 -- CreateEnum
-CREATE TYPE "OnlineScreen" AS ENUM ('MENU', 'LEVELS', 'TOPICS', 'TASK', 'TASKS');
+CREATE TYPE "OnlineScreen" AS ENUM ('MENU', 'LEVELS', 'TOPICS', 'TASK');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -30,6 +30,7 @@ CREATE TABLE "User" (
     "currentTopic" INTEGER,
     "currentTask" "TaskType",
     "uiScreen" "OnlineScreen",
+    "isLevelCompleted" BOOLEAN NOT NULL DEFAULT false,
     "updatedAt" TIMESTAMPTZ(6),
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
