@@ -9,7 +9,7 @@ export const B2_7_TOPIC: Topic = {
     },
     description: {
         kk: "src/assets/document/b2/kk/7-сабақ. В2 ол қандай адам.docx",
-        ru: "src/assets/document/b2/ru/7-сабақ. В2 ол қандай адам.docx",
+        ru: "src/assets/document/b2/ru/7. В2КАКОЙ ОН ЧЕЛОВЕК.docx",
         en: "src/assets/document/b2/en/7. В2 What kind of person is he.docx"
     },
     writingTitle: {
