@@ -62,7 +62,11 @@ export class LearningHandler {
             const locked = index > userLevelIndex;
 
             keyboard.text(
-                level,
+                locked
+                    ? level
+                    : userLevelIndex === index
+                        ? `✍️ ${level}`
+                        : `✅ ${level}`,
                 locked ? 'level_locked' : `level_${level}`
             );
             keyboard.row();
@@ -85,6 +89,13 @@ export class LearningHandler {
     async openLevel(ctx: Context, user: User, level: Level) {
         const topics = TOPICS[level];
 
+        const results = await this.prisma.topicResult.findMany({
+            where: {
+                userId: user.id,
+                level
+            },
+        }) as TopicResult[];
+
         await this.prisma.user.update({
             where: { id: user.id },
             data: {
@@ -95,9 +106,17 @@ export class LearningHandler {
 
         const keyboard = new InlineKeyboard();
 
-        topics.forEach((_, index) => {
+        topics.forEach((topic, index) => {
+            const topicResult = results.find(r => r.topic === index);
+
             keyboard.text(
-                `${index + 1}-${this.i18n.t('menu.topic', user.language)}`,
+                topicResult
+                    && topicResult.writingAnswer
+                    && topicResult.readingAnswer.length === topic.readingTest.length
+                    && topicResult.listeningAnswer
+                    && topicResult.speakingFile
+                    ? `✅ ${index + 1}-${this.i18n.t('menu.topic', user.language)}`
+                    : `${index + 1}-${this.i18n.t('menu.topic', user.language)}`,
                 `topic_${index}`
             );
             keyboard.row();
@@ -139,6 +158,16 @@ export class LearningHandler {
     // TASKS
 
     async openTopic(ctx: Context, user: User, topicIndex: number) {
+        const topic = TOPICS[user.currentLevel!][topicIndex];
+
+        const result = await this.prisma.topicResult.findFirst({
+            where: {
+                userId: user.id,
+                level: user.currentLevel!,
+                topic: topicIndex,
+            },
+        }) as TopicResult;
+
         const keyboard = new InlineKeyboard();
 
         keyboard.text(
@@ -149,24 +178,32 @@ export class LearningHandler {
         keyboard.row();
 
         keyboard.text(
-            this.i18n.t('menu.writing', user.language),
+            result.writingAnswer
+                ? `✅ ${this.i18n.t('menu.writing', user.language)}`
+                : this.i18n.t('menu.writing', user.language),
             'task_writing'
         );
 
         keyboard.text(
-            this.i18n.t('menu.reading', user.language),
+            result.readingAnswer.length === topic.readingTest.length
+                ? `✅ ${this.i18n.t('menu.reading', user.language)}`
+                : this.i18n.t('menu.reading', user.language),
             'task_reading'
         );
 
         keyboard.row();
 
         keyboard.text(
-            this.i18n.t('menu.listening', user.language),
+            result.listeningAnswer
+                ? `✅ ${this.i18n.t('menu.listening', user.language)}`
+                : this.i18n.t('menu.listening', user.language),
             'task_listening'
         );
 
         keyboard.text(
-            this.i18n.t('menu.speaking', user.language),
+            result.speakingFile
+                ? `✅ ${this.i18n.t('menu.speaking', user.language)}`
+                : this.i18n.t('menu.speaking', user.language),
             'task_speaking'
         );
 
