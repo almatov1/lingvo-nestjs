@@ -73,7 +73,7 @@ export default {
     `),
     menu: {
         title: "📋 Меню",
-        topics: "📶 Уровни",
+        levels: "📶 Уровни",
         toolbox: "🌐 Языковой toolbox",
         description: "🔠 Новые слова и грамматика",
         writing: "✍️ Письмо",

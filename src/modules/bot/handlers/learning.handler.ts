@@ -115,8 +115,8 @@ export class LearningHandler {
                     && topicResult.readingAnswer.length === topic.readingTest.length
                     && topicResult.listeningAnswer
                     && topicResult.speakingFile
-                    ? `✅ ${index + 1}-${this.i18n.t('menu.topic', user.language)}`
-                    : `${index + 1}-${this.i18n.t('menu.topic', user.language)}`,
+                    ? `✅ ${index + 1}-${this.i18n.t('topic', user.language)}`
+                    : `${index + 1}-${this.i18n.t('topic', user.language)}`,
                 `topic_${index}`
             );
             keyboard.row();
@@ -126,7 +126,7 @@ export class LearningHandler {
             .text(this.i18n.t('menu.levels', user.language), 'menu_back');
 
         await ctx.editMessageText(
-            this.i18n.t('menu.topics', user.language),
+            this.i18n.t('menu.tasks', user.language),
             {
                 parse_mode: 'HTML',
                 reply_markup: keyboard
@@ -139,7 +139,7 @@ export class LearningHandler {
     async showToolbox(ctx: Context, user: User) {
         const keyboard = new InlineKeyboard();
         keyboard
-            .text(this.i18n.t('menu.back', user.language), 'menu_back');
+            .text(this.i18n.t('menu.title', user.language), 'menu_back');
 
         await this.prisma.user.update({
             where: { id: user.id },
@@ -166,7 +166,7 @@ export class LearningHandler {
                 level: user.currentLevel!,
                 topic: topicIndex,
             },
-        }) as TopicResult;
+        }) as TopicResult | undefined;
 
         const keyboard = new InlineKeyboard();
 
@@ -178,15 +178,15 @@ export class LearningHandler {
         keyboard.row();
 
         keyboard.text(
-            result.writingAnswer
-                ? `✅ ${this.i18n.t('menu.writing', user.language)}`
+            result?.writingAnswer
+                ? `${this.i18n.t('menu.writing', user.language)} ✅`
                 : this.i18n.t('menu.writing', user.language),
             'task_writing'
         );
 
         keyboard.text(
-            result.readingAnswer.length === topic.readingTest.length
-                ? `✅ ${this.i18n.t('menu.reading', user.language)}`
+            result?.readingAnswer.length === topic.readingTest.length
+                ? `${this.i18n.t('menu.reading', user.language)} ✅`
                 : this.i18n.t('menu.reading', user.language),
             'task_reading'
         );
@@ -194,22 +194,22 @@ export class LearningHandler {
         keyboard.row();
 
         keyboard.text(
-            result.listeningAnswer
-                ? `✅ ${this.i18n.t('menu.listening', user.language)}`
+            result?.listeningAnswer
+                ? `${this.i18n.t('menu.listening', user.language)} ✅`
                 : this.i18n.t('menu.listening', user.language),
             'task_listening'
         );
 
         keyboard.text(
-            result.speakingFile
-                ? `✅ ${this.i18n.t('menu.speaking', user.language)}`
+            result?.speakingFile
+                ? `${this.i18n.t('menu.speaking', user.language)} ✅`
                 : this.i18n.t('menu.speaking', user.language),
             'task_speaking'
         );
 
         keyboard.row();
 
-        keyboard.text(this.i18n.t('menu.tasks', user.language), 'menu_back');
+        keyboard.text(this.i18n.t('menu.goBack', user.language), 'topic_back');
 
         await this.prisma.user.update({
             where: { id: user.id },
@@ -260,16 +260,16 @@ export class LearningHandler {
                 level: user.currentLevel!,
                 topic: user.currentTopic!,
             },
-        }) as TopicResult;
+        }) as TopicResult | undefined;
 
-        if (result.writingAnswer) await this.writingResult(ctx, user, false);
+        if (result?.writingAnswer) await this.writingResult(ctx, user, false);
         else {
             await this.prisma.user.update({
                 where: { id: user.id },
                 data: { currentTask: TaskType.WRITING }
             });
 
-            await ctx.reply(
+            await ctx.editMessageText(
                 dedent(`
                 ${topic.writingTitle[user.language]}
 
@@ -289,11 +289,11 @@ export class LearningHandler {
                 level: user.currentLevel!,
                 topic: user.currentTopic!,
             },
-        }) as TopicResult;
+        }) as TopicResult | undefined;
 
         const text = dedent(`
             ${this.i18n.t('yourAnswer', user.language)}:
-            ${result.writingAnswer}
+            ${result?.writingAnswer}
 
             ${this.i18n.t('correctlyAnswer', user.language)}:
             ${topic.writingAnswer}
@@ -367,9 +367,9 @@ export class LearningHandler {
                 level: user.currentLevel!,
                 topic: user.currentTopic!,
             },
-        }) as TopicResult;
+        }) as TopicResult | undefined;
 
-        const formattedAnswers = (result.readingAnswer as string[])
+        const formattedAnswers = (result?.readingAnswer as string[])
             .map((ans, idx) => `${idx + 1}. ${ans}`)
             .join('\n');
         const text = dedent(`
@@ -444,11 +444,11 @@ export class LearningHandler {
                 level: user.currentLevel!,
                 topic: user.currentTopic!,
             },
-        }) as TopicResult;
+        }) as TopicResult | undefined;
 
         const text = dedent(`
             ${this.i18n.t('yourAnswer', user.language)}:
-            ${result.listeningAnswer}
+            ${result?.listeningAnswer}
 
             ${this.i18n.t('correctlyAnswer', user.language)}:
             ${topic.listeningAnswer}
@@ -592,6 +592,7 @@ export class LearningHandler {
 
         // TASK SCREEN
         if (user.uiScreen === OnlineScreen.TASK) {
+            if (data === 'topic_back') return this.openLevel(ctx, user, user.currentLevel!);
             if (data === 'menu_back') return this.openTopic(ctx, user, user.currentTopic!);
 
             switch (data) {
@@ -654,7 +655,7 @@ export class LearningHandler {
                 }
 
                 await this.checkRaising(user);
-                await this.readingResult(ctx, user, true);
+                await this.readingResult(ctx, user, false);
                 return;
             }
         }

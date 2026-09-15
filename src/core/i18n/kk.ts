@@ -73,7 +73,7 @@ export default {
     `),
     menu: {
         title: "📋 Мәзір",
-        topics: "📶 Деңгейлер",
+        levels: "📶 Деңгейлер",
         toolbox: "🌐 Тілдік toolbox",
         description: "🔠 Жаңа сөздер мен грамматика",
         writing: "✍️ Жазылым",

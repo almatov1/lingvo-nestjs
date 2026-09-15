@@ -77,7 +77,6 @@ enum OnlineScreen {
   LEVELS
   TOPICS
   TASK
-  TASKS
 }
 
 model TopicResult {
