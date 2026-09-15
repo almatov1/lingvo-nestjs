@@ -63,7 +63,7 @@ export class LearningHandler {
 
             keyboard.text(
                 locked
-                    ? level
+                    ? `🔒 ${level}`
                     : userLevelIndex === index
                         ? `✍️ ${level}`
                         : `✅ ${level}`,
