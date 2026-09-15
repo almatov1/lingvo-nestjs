@@ -340,33 +340,44 @@ export class LearningHandler {
             },
         });
         const topic = TOPICS[user.currentLevel!][user.currentTopic!];
+        const questionIndex = result?.readingAnswer.length ?? 0;
 
-        if (result?.readingAnswer.length === topic.readingTest.length) await this.readingResult(ctx, user, false);
-        else {
-            await this.prisma.user.update({
-                where: { id: user.id },
-                data: { currentTask: TaskType.READING }
-            });
-
-            const keyboard = new InlineKeyboard();
-
-            const q = topic.readingTest[result?.readingAnswer.length!];
-            topic.readingTest[result?.readingAnswer.length!].answers.forEach((a, i) => {
-                keyboard.text(`${VARIANT_LABEL_LOWER_CASE[i]} ${a}`, a);
-                keyboard.row();
-            });
-
-            await ctx.editMessageText(
-                dedent(`
-                    ${topic.reading}
-
-                    ${q.question}
-                `),
-                {
-                    parse_mode: 'HTML',
-                    reply_markup: keyboard
-                })
+        if (questionIndex >= topic.readingTest.length) {
+            await this.readingResult(ctx, user, false);
+            return;
         }
+
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { currentTask: TaskType.READING }
+        });
+
+        const keyboard = new InlineKeyboard();
+        const q = topic.readingTest[questionIndex];
+
+        q.answers.forEach((a, i) => {
+            keyboard.text(
+                VARIANT_LABEL_LOWER_CASE[i],
+                String(i)
+            );
+
+            if (i % 2 === 1) keyboard.row();
+        });
+
+        await ctx.editMessageText(
+            dedent(`
+                ${topic.reading}
+
+                ${q.question}
+                ${q.answers
+                    .map((a, i) => `${VARIANT_LABEL_LOWER_CASE[i]} ${a}`)
+                    .join('\n')}
+            `),
+            {
+                parse_mode: 'HTML',
+                reply_markup: keyboard
+            }
+        );
     }
 
     async readingResult(ctx: Context, user: User, isReply: boolean) {
@@ -638,10 +649,17 @@ export class LearningHandler {
                 });
                 const topic = TOPICS[level][topicIndex];
 
+                const questionIndex = result?.readingAnswer.length ?? 0;
+                const question = topic.readingTest[questionIndex];
+
+                const answerIndex = Number(data);
+                const answer = question.answers[answerIndex];
+
                 const updatedAnswers = [
                     ...(result?.readingAnswer ?? []),
-                    data
+                    answer
                 ];
+
                 await this.prisma.topicResult.upsert({
                     where: {
                         userId_level_topic: {
@@ -660,6 +678,7 @@ export class LearningHandler {
                 });
 
                 const nextIndex = updatedAnswers.length;
+
                 if (nextIndex < topic.readingTest.length) {
                     await this.startReading(ctx, user);
                     return;

@@ -59,10 +59,17 @@ export class TestHandler {
 
         const keyboard = new InlineKeyboard();
 
-        q.answers.forEach((a, i) => {
-            keyboard.text(`${VARIANT_LABEL[i]} ${a}`, String(i));
-            keyboard.row();
+        q.answers.forEach((_, i) => {
+            keyboard.text(VARIANT_LABEL[i], String(i));
+
+            if (i % 2 === 1) {
+                keyboard.row();
+            }
         });
+
+        const answersText = q.answers
+            .map((a, i) => `${VARIANT_LABEL[i]} ${a}`)
+            .join('\n');
 
         const material = this.MATERIALS[index];
 
@@ -78,6 +85,7 @@ export class TestHandler {
                         ${this.i18n.t('test', user.language)}
 
                         ${questionNumber}. ${q.question}
+                        ${answersText}
                     `),
                     parse_mode: 'HTML',
                     reply_markup: keyboard
@@ -92,7 +100,10 @@ export class TestHandler {
                 return await ctx.replyWithAudio(
                     new InputFile(material.file),
                     {
-                        caption: `${questionNumber}. ${q.question}`,
+                        caption: dedent(`
+                            ${questionNumber}. ${q.question}
+                            ${answersText}
+                        `),
                         parse_mode: 'HTML',
                         reply_markup: keyboard
                     }
@@ -105,6 +116,7 @@ export class TestHandler {
                         ${material.text}
 
                         ${questionNumber}. ${q.question}
+                        ${answersText}
                     `),
                     {
                         parse_mode: 'HTML',
@@ -116,7 +128,10 @@ export class TestHandler {
 
         if (index < 20) {
             return ctx.editMessageCaption({
-                caption: `${questionNumber}. ${q.question}`,
+                caption: dedent(`
+                    ${questionNumber}. ${q.question}
+                    ${answersText}
+                `),
                 parse_mode: 'HTML',
                 reply_markup: keyboard,
             });
@@ -140,6 +155,7 @@ export class TestHandler {
                 ${readingText}
 
                 ${questionNumber}. ${q.question}
+                ${answersText}
             `),
             {
                 parse_mode: 'HTML',
