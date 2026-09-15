@@ -14,7 +14,7 @@ CREATE TYPE "Step" AS ENUM ('CHOOSE_LANGUAGE', 'REGISTRATION', 'PLACEMENT_TEST',
 CREATE TYPE "TaskType" AS ENUM ('WRITING', 'READING', 'LISTENING', 'SPEAKING');
 
 -- CreateEnum
-CREATE TYPE "OnlineScreen" AS ENUM ('MENU', 'TOPICS', 'LESSON', 'TASKS');
+CREATE TYPE "OnlineScreen" AS ENUM ('MENU', 'LEVELS', 'TOPICS', 'TASK', 'TASKS');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -26,6 +26,7 @@ CREATE TABLE "User" (
     "format" "Format",
     "currentStep" "Step" NOT NULL DEFAULT 'CHOOSE_LANGUAGE',
     "testAnswers" INTEGER[],
+    "currentLevel" "Level",
     "currentTopic" INTEGER,
     "currentTask" "TaskType",
     "uiScreen" "OnlineScreen",
@@ -42,7 +43,7 @@ CREATE TABLE "TopicResult" (
     "level" "Level" NOT NULL,
     "topic" INTEGER NOT NULL,
     "writingAnswer" TEXT,
-    "readingAnswers" INTEGER[],
+    "readingAnswer" TEXT[],
     "listeningAnswer" TEXT,
     "speakingFile" TEXT,
     "updatedAt" TIMESTAMPTZ(6),
