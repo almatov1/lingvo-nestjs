@@ -8,9 +8,9 @@ export const A2_7_TOPIC: Topic = {
         en: "CLOCK HANDS"
     },
     description: {
-        kk: "src/assets/document/a1/ru/7-сабақ.А2.Сағат тілі (каз-рус).docx",
-        ru: "src/assets/document/a1/ru/7-сабақ.А2.Сағат тілі (каз-рус).docx",
-        en: "src/assets/document/a1/en/7-сабақ.А2.Сағат тілі(каз-англ).docx"
+        kk: "src/assets/document/a2/ru/7-сабақ.А2.Сағат тілі (каз-рус).docx",
+        ru: "src/assets/document/a2/ru/7-сабақ.А2.Сағат тілі (каз-рус).docx",
+        en: "src/assets/document/a2/en/7-сабақ.А2.Сағат тілі(каз-англ).docx"
     },
     writingTitle: {
         kk: "Тиісті сөзбен жалғауды табыңыз.",

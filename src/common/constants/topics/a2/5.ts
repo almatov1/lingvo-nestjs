@@ -8,9 +8,9 @@ export const A2_5_TOPIC: Topic = {
         en: "BIOGRAPHY"
     },
     description: {
-        kk: "src/assets/document/a1/ru/5-сабақ А2. Өмірбаян (каз-рус).docx",
-        ru: "src/assets/document/a1/ru/5-сабақ А2. Өмірбаян (каз-рус).docx",
-        en: "src/assets/document/a1/en/5-сабақ А2. Өмірбаян (каз-англ).docx"
+        kk: "src/assets/document/a2/ru/5-сабақ А2. Өмірбаян (каз-рус).docx",
+        ru: "src/assets/document/a2/ru/5-сабақ А2. Өмірбаян (каз-рус).docx",
+        en: "src/assets/document/a2/en/5-сабақ А2. Өмірбаян (каз-англ).docx"
     },
     writingTitle: {
         kk: "Тиісті сөзбен жалғауды табыңыз.",

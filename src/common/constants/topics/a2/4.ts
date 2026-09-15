@@ -8,9 +8,9 @@ export const A2_4_TOPIC: Topic = {
         en: "OUR TEAM"
     },
     description: {
-        kk: "src/assets/document/a1/ru/4-сабақ А2. Біздің ұжым (каз-рус).docx",
-        ru: "src/assets/document/a1/ru/4-сабақ А2. Біздің ұжым (каз-рус).docx",
-        en: "src/assets/document/a1/en/4-сабақ. А2. Біздің ұжым (каз-англ).docx"
+        kk: "src/assets/document/a2/ru/4-сабақ А2. Біздің ұжым (каз-рус).docx",
+        ru: "src/assets/document/a2/ru/4-сабақ А2. Біздің ұжым (каз-рус).docx",
+        en: "src/assets/document/a2/en/4-сабақ. А2. Біздің ұжым (каз-англ).docx"
     },
     writingTitle: {
         kk: "Тиісті сөзбен жалғауды табыңыз.",

@@ -8,9 +8,9 @@ export const A2_10_TOPIC: Topic = {
         en: "THE WORLD OF ANIMALS AND PLANTS"
     },
     description: {
-        kk: "src/assets/document/a1/ru/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-рус).docx",
-        ru: "src/assets/document/a1/ru/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-рус).docx",
-        en: "src/assets/document/a1/en/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-англ).docx"
+        kk: "src/assets/document/a2/ru/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-рус).docx",
+        ru: "src/assets/document/a2/ru/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-рус).docx",
+        en: "src/assets/document/a2/en/10-сабақ. А2. Өсімдіктер мен жануарлар әлемі (каз-англ).docx"
     },
     writingTitle: {
         kk: "Тиісті сөзбен жалғауды табыңыз.",
