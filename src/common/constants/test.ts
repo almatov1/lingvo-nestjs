@@ -658,4 +658,4 @@ export const READING_4_TEST = [
 ];
 
 export const VARIANT_LABEL = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)'];
-export const VARIANT_LABEL_LOWER_CASE = ['а)', 'ә)', 'б)', 'в)', 'г)', 'д)'];
+export const VARIANT_LABEL_LOWER_CASE = ['А)', 'Ә)', 'Б)', 'В)', 'Г)', 'Д)'];

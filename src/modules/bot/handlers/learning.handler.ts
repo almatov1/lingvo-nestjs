@@ -653,7 +653,7 @@ export class LearningHandler {
                 const question = topic.readingTest[questionIndex];
 
                 const answerIndex = Number(data);
-                const answer = question.answers[answerIndex];
+                const answer = `${VARIANT_LABEL_LOWER_CASE[answerIndex]} ${question.answers[answerIndex]}`;
 
                 const updatedAnswers = [
                     ...(result?.readingAnswer ?? []),
