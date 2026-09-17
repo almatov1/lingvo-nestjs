@@ -74,11 +74,11 @@ export const A1_10_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1.	Ә) Туған күн 
-        2.	Ә) Гүл мен сыйлық 
-        3.	Ә) Қуанды  
-        4.	Ә) Ән айтты 
-        5.	Ә) Ура!
+        1.	ә) Туған күн 
+        2.	ә) Гүл мен сыйлық 
+        3.	ә) Қуанды  
+        4.	ә) Ән айтты 
+        5.	ә) Ура!
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-10_Құттықтау.-Одағай-сөздер.mp3`,
     listeningTitle: {

@@ -74,11 +74,11 @@ export const A1_2_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1. Ә) Кеңседе
-        2. Б) Дүйсенбі–жұма
-        3. A) Сағат 7-де
-        4. В) 6
-        5. В) бірінші, бесінші.
+        1. ә) Кеңседе
+        2. б) Дүйсенбі–жұма
+        3. а) Сағат 7-де
+        4. в) 6
+        5. в) бірінші, бесінші.
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-2_Менің-апталық-кестем.mp3`,
     listeningTitle: {

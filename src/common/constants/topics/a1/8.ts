@@ -75,11 +75,11 @@ export const A1_8_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1.	Ә) қалада
-        2.	Ә) мұғалім
-        3.	Ә) дәрігер
-        4.	Б) оқушы
-        5.	А) -ма, -ме
+        1.	ә) қалада
+        2.	ә) мұғалім
+        3.	ә) дәрігер
+        4.	б) оқушы
+        5.	а) -ма, -ме
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-8_Мамандық.mp3`,
     listeningTitle: {

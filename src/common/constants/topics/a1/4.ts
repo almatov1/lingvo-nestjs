@@ -74,11 +74,11 @@ export const A1_4_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1.	Б) 5 адам 
-        2.	Ә) Жүргізуші 
-        3.	Б) Гүлнар 
-        4.	Б) апаң
-        5.	В) Бірге серуендейді
+        1.	б) 5 адам 
+        2.	ә) Жүргізуші 
+        3.	б) Гүлнар 
+        4.	б) апаң
+        5.	в) Бірге серуендейді
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-4_Менің-отбасым.mp3`,
     listeningTitle: {

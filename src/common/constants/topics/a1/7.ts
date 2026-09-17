@@ -77,11 +77,11 @@ export const A1_7_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1.	Ә) дәруменге
-        2.	Б) тамағын
-        3.	А) Үндістанда
-        4.	В) Таңертең және түсте
-        5.	Б) банандар
+        1.	ә) дәруменге
+        2.	б) тамағын
+        3.	а) Үндістанда
+        4.	в) Таңертең және түсте
+        5.	б) банандар
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-7_Азық-түлік.mp3`,
     listeningTitle: {

@@ -74,11 +74,11 @@ export const A1_6_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1.	Ә) Орташа
-        2.	Б) Қоңыр
-        3.	Ә) Ұзынырақ 
-        4.	Б) Сабырлы және ашық 
-        5.	А) Қымбаттырақ
+        1.	ә) Орташа
+        2.	б) Қоңыр
+        3.	ә) Ұзынырақ 
+        4.	б) Сабырлы және ашық 
+        5.	а) Қымбаттырақ
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-6_Келбет.-Мінез.mp3`,
     listeningTitle: {

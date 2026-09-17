@@ -74,11 +74,11 @@ export const A1_5_TOPIC: Topic = {
         }
     ],
     readingAnswer: dedent(`
-        1. Ә) Қып-қызыл 
-        2. Б) Көк жейде 
-        3. A) Қап-қара 
-        4. Ә) Жап-жасыл 
-        5. Б) Қып-қызыл
+        1. ә) Қып-қызыл 
+        2. б) Көк жейде 
+        3. а) Қап-қара 
+        4. ә) Жап-жасыл 
+        5. б) Қып-қызыл
     `),
     listeningAudioPath: `src/assets/audio/a1/A1-5_Киім-түстері.mp3`,
     listeningTitle: {
