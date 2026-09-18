@@ -368,8 +368,7 @@ export class LearningHandler {
 
         await ctx.editMessageText(
             dedent(`
-                ${questionIndex === 0 && `${this.i18n.t('reading', user.language)}\n\n`}
-                ${topic.reading}
+                ${questionIndex === 0 ? `${this.i18n.t('reading', user.language)}\n${topic.reading}` : topic.reading}
 
                 ${q.question}
                 ${q.answers
