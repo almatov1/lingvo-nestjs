@@ -368,7 +368,9 @@ export class LearningHandler {
 
         await ctx.editMessageText(
             dedent(`
-                ${questionIndex === 0 ? `${this.i18n.t('reading', user.language)}\n${topic.reading}` : topic.reading}
+                ${this.i18n.t('reading', user.language)}
+                
+                ${topic.reading}
 
                 ${q.question}
                 ${q.answers
@@ -448,16 +450,21 @@ export class LearningHandler {
             await ctx.replyWithAudio(
                 new InputFile(topic.listeningAudioPath),
                 {
-                    caption: dedent(`
-                        ${this.i18n.t('listening', user.language)}
-
-                        ${topic.listeningTitle[user.language]}
-
-                        ${topic.listening}
-                    `),
+                    caption: this.i18n.t('listening', user.language),
                     parse_mode: 'HTML'
                 }
             );
+
+            await ctx.reply(
+                dedent(`
+                    ${topic.listeningTitle[user.language]}
+
+                    ${topic.listening}
+                `),
+                {
+                    parse_mode: 'HTML'
+                }
+            )
         }
     }
 
