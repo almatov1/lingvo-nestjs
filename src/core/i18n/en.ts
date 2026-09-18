@@ -85,6 +85,32 @@ export default {
     },
     lockedLevel: 'This level is unavailable. Complete the previous levels.',
     topic: "lesson",
+    reading: dedent(`
+        <b>Reading</b>
+        Read the short text.
+        After reading, try to complete the tasks.
+        Take your time — understanding what you read is what matters.
+    `),
+    writing: dedent(`
+        <b>Writing</b>
+        Now, try to express your thoughts in writing.
+        Complete a short writing task on the topic.
+        Don't be afraid of making mistakes — we learn through practice!    
+    `),
+    listening: dedent(`
+        <b>Listening</b>
+        Now, let's listen to the audio. 🎧
+        Listen to the text carefully and try to catch the main idea.
+        Then, try to complete the tasks.
+        Don't worry — with every listening practice, your language skills get better! 🌟
+    `),
+    speaking: dedent(`
+        <b>Speaking</b>
+        Try to answer the questions orally.
+        Try to speak freely.
+        The main thing is to strive to express your thoughts in Kazakh.
+        You can definitely do it! 🌟
+    `),
     yourAnswer: "Your answer",
     correctlyAnswer: "Correctly answer"
 } as const;

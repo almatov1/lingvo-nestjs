@@ -282,6 +282,8 @@ export class LearningHandler {
 
             await ctx.editMessageText(
                 dedent(`
+                ${this.i18n.t('writing', user.language)}
+
                 ${topic.writingTitle[user.language]}
 
                 ${topic.writing}
@@ -355,7 +357,7 @@ export class LearningHandler {
         const keyboard = new InlineKeyboard();
         const q = topic.readingTest[questionIndex];
 
-        q.answers.forEach((a, i) => {
+        q.answers.forEach((_, i) => {
             keyboard.text(
                 VARIANT_LABEL_LOWER_CASE[i],
                 String(i)
@@ -366,6 +368,7 @@ export class LearningHandler {
 
         await ctx.editMessageText(
             dedent(`
+                ${questionIndex === 0 && `${this.i18n.t('reading', user.language)}\n\n`}
                 ${topic.reading}
 
                 ${q.question}
@@ -447,6 +450,8 @@ export class LearningHandler {
                 new InputFile(topic.listeningAudioPath),
                 {
                     caption: dedent(`
+                        ${this.i18n.t('listening', user.language)}
+
                         ${topic.listeningTitle[user.language]}
 
                         ${topic.listening}
@@ -516,6 +521,8 @@ export class LearningHandler {
 
             await ctx.editMessageText(
                 dedent(`
+                    ${this.i18n.t('speaking', user.language)}
+
                     ${topic.speakingTitle[user.language]}
 
                     ${topic.speaking}
