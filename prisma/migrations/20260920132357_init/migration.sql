@@ -60,4 +60,4 @@ CREATE UNIQUE INDEX "User_telegramId_key" ON "User"("telegramId");
 CREATE UNIQUE INDEX "TopicResult_userId_level_topic_key" ON "TopicResult"("userId", "level", "topic");
 
 -- AddForeignKey
-ALTER TABLE "TopicResult" ADD CONSTRAINT "TopicResult_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TopicResult" ADD CONSTRAINT "TopicResult_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -7,11 +7,13 @@ import { TestHandler } from './handlers/test.handler'
 import { FormatHandler } from './handlers/format.handler'
 import { LearningHandler } from './handlers/learning.handler'
 import { StorageModule } from 'src/core/storage/storage.module'
+import { RestartHandler } from './handlers/restart.handler'
 
 @Module({
     imports: [StorageModule],
     providers: [
         BotService,
+        RestartHandler,
         StateRouter,
         LanguageHandler,
         RegistrationHandler,
