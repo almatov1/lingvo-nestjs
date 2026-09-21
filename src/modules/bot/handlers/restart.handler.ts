@@ -13,7 +13,7 @@ export class RestartHandler {
     async handle(ctx: Context) {
         if (!ctx.from) return;
 
-        await this.prisma.user.delete({
+        await this.prisma.user.deleteMany({
             where: {
                 telegramId: BigInt(ctx.from.id),
             },
