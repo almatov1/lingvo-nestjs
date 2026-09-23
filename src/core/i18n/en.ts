@@ -50,7 +50,7 @@ export default {
         State Institution "Department of Language Development of Aktobe Region"
         Communal State Institution "Language Training Center"
         <b>Address:</b>
-        86 Turgenev Street, Aktobe City
+        91 Maresyev Street, Aktobe City
         <b>Contact Number:</b>
         +7 (7132) 46-78-68
 
